@@ -39,11 +39,11 @@ app.use(errorHandler);
 
 // Only listen directly if executed as standalone script (local dev / Render)
 if (require.main === module) {
-  // Serve frontend statically in standalone mode
-  app.use(express.static(path.join(__dirname, "../frontend")));
+  // Serve frontend files directly from project root in standalone mode
+  app.use(express.static(path.join(__dirname, "..")));
   app.get("*", (req, res, next) => {
     if (req.path.startsWith("/api")) return next();
-    res.sendFile(path.join(__dirname, "../frontend/index.html"));
+    res.sendFile(path.join(__dirname, "../index.html"));
   });
 
   app.listen(PORT, () => {
