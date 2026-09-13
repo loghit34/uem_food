@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    UEM EATS V2 - Global Design System & Variables
    ========================================================= */
 :root {
@@ -213,6 +213,69 @@ input, select, textarea {
 
 .card:hover {
   box-shadow: var(--shadow-md);
+}
+
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+/* Food / Menu Item Card */
+.food-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.food-img {
+  height: 150px;
+  max-height: 160px;
+  width: 100%;
+  object-fit: cover;
+  background-color: #f1f5f9;
+}
+
+.food-details {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.food-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.food-category {
+  font-size: 0.75rem;
+  color: var(--primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.food-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0.35rem 0 0.85rem 0;
+  flex: 1;
+}
+
+.food-price-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.food-price {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--secondary);
 }
 
 /* Badges */
