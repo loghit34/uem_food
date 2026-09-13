@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - UEM EATS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="dashboard.html" class="brand-logo">
+        👑 UEM<span>EATS Admin</span>
+      </a>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <span id="nav-user-name" style="font-weight: 600; color: var(--secondary);"></span>
+        <button onclick="Auth.logout()" class="btn btn-outline btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <h1 class="section-title">Platform Administration</h1>
+      <div class="grid-cards" style="margin-bottom: 2rem;">
+        <div class="card" style="padding: 1.5rem; text-align: center;">
+          <h3>👥 Manage Users</h3>
+          <p style="color:var(--text-muted); margin: 0.5rem 0 1rem 0;">View student, faculty, and vendor user accounts.</p>
+          <a href="users.html" class="btn btn-outline btn-sm">Open Users</a>
+        </div>
+        <div class="card" style="padding: 1.5rem; text-align: center;">
+          <h3>🏪 Manage Vendors</h3>
+          <p style="color:var(--text-muted); margin: 0.5rem 0 1rem 0;">Approve, activate, or deactivate campus food stalls.</p>
+          <a href="vendors.html" class="btn btn-outline btn-sm">Open Vendors</a>
+        </div>
+        <div class="card" style="padding: 1.5rem; text-align: center;">
+          <h3>📊 Global Orders</h3>
+          <p style="color:var(--text-muted); margin: 0.5rem 0 1rem 0;">Monitor transactions and all paid campus orders.</p>
+          <a href="orders.html" class="btn btn-outline btn-sm">Open Orders</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    Auth.requireAuth(["ADMIN"]);
+  </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - UEM EATS V2</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo-icon">🍱</div>
+        <h1>Create Account</h1>
+        <p>Register for UEM EATS campus dining</p>
+      </div>
+
+      <form id="register-form">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" class="form-control" placeholder="John Doe" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Campus Email</label>
+          <input type="email" id="email" class="form-control" placeholder="name@uem.edu.in" required>
+        </div>
+
+        <div class="form-group">
+          <label for="role">Account Type</label>
+          <select id="role" class="form-control" required>
+            <option value="STUDENT">Student</option>
+            <option value="FACULTY">Faculty Member</option>
+            <option value="VENDOR">Campus Food Vendor</option>
+          </select>
+        </div>
+
+        <div id="vendor-fields" style="display: none;">
+          <div class="form-group">
+            <label for="vendor_name">Vendor / Stall Name</label>
+            <input type="text" id="vendor_name" class="form-control" placeholder="e.g. SAC Cafe">
+          </div>
+          <div class="form-group">
+            <label for="location">Campus Location</label>
+            <input type="text" id="location" class="form-control" placeholder="e.g. Block B Food Court">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password (min 6 characters)</label>
+          <input type="password" id="password" class="form-control" placeholder="••••••••" minlength="6" required>
+        </div>
+
+        <button type="submit" id="register-btn" class="btn btn-primary btn-block">Sign Up</button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Sign In</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+    // Toggle vendor fields when role is VENDOR
+    document.getElementById("role").addEventListener("change", (e) => {
+      const isVendor = e.target.value === "VENDOR";
+      document.getElementById("vendor-fields").style.display = isVendor ? "block" : "none";
+    });
+
+    document.getElementById("register-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const role = document.getElementById("role").value;
+      const vendorName = document.getElementById("vendor_name").value.trim();
+      const location = document.getElementById("location").value.trim();
+      const password = document.getElementById("password").value;
+      const btn = document.getElementById("register-btn");
+
+      btn.disabled = true;
+      btn.textContent = "Creating account...";
+
+      try {
+        // Step 1: Sign up in Supabase Auth
+        const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { name, role }
+          }
+        });
+
+        if (authError) throw authError;
+
+        // Step 2: Sync profile in DB via backend
+        await UEM.apiFetch("/auth/sync-profile", {
+          method: "POST",
+          body: JSON.stringify({
+            id: authData.user.id,
+            email,
+            name,
+            role,
+            vendor_name: vendorName,
+            location: location,
+          })
+        });
+
+        UEM.showToast("Account created successfully! Please login.", "success");
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 1500);
+      } catch (err) {
+        UEM.showToast(err.message, "error");
+        btn.disabled = false;
+        btn.textContent = "Sign Up";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Orders - Vendor Portal</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/vendor.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="dashboard.html" class="brand-logo">
+        🏪 UEM<span>EATS Vendor</span>
+      </a>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <span id="nav-user-name" style="font-weight: 600; color: var(--secondary);"></span>
+        <button onclick="Auth.logout()" class="btn btn-outline btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="vendor-layout">
+    <aside class="sidebar">
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html" class="sidebar-link">📊 Dashboard</a></li>
+        <li><a href="orders.html" class="sidebar-link active">📦 Live Orders</a></li>
+        <li><a href="menu.html" class="sidebar-link">🍔 Menu Manager</a></li>
+        <li><a href="analytics.html" class="sidebar-link">📈 Sales & Analytics</a></li>
+      </ul>
+    </aside>
+
+    <main class="vendor-main">
+      <div class="section-title">
+        <span>Incoming Confirmed Orders (Paid Only)</span>
+        <button onclick="loadOrders()" class="btn btn-secondary btn-sm">🔄 Refresh Orders</button>
+      </div>
+      <div id="vendor-orders-queue">
+        <!-- Rendered via orders.js -->
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/vendor/orders.js"></script>
+</body>
+</html>

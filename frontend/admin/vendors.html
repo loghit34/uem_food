@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Manage Vendors</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="dashboard.html" class="brand-logo">👑 UEM<span>EATS Admin</span></a>
+      <a href="dashboard.html" class="btn btn-outline btn-sm">&larr; Back to Dashboard</a>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <h1 class="section-title">Campus Food Outlets & Vendors</h1>
+      <div id="vendors-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Vendor Name</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="vendors-tbody">
+            <!-- Loaded via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    Auth.requireAuth(["ADMIN"]);
+  </script>
+</body>
+</html>

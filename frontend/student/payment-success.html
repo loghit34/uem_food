@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful - UEM EATS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/student.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="home.html" class="brand-logo">
+        🍱 UEM<span>EATS</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="home.html" class="nav-link">Home</a></li>
+          <li><a href="orders.html" class="nav-link">My Orders</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container" style="max-width: 600px; text-align: center; padding-top: 3rem;">
+      <div class="card" style="padding: 3rem 2rem;">
+        <div style="font-size: 4rem; color: var(--accent); margin-bottom: 1rem;">✅</div>
+        <h1 style="color: var(--secondary); margin-bottom: 0.5rem;">Payment Confirmed!</h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 1.5rem;">
+          Your order has been paid and sent straight to the canteen kitchen.
+        </p>
+
+        <div style="background: #f8fafc; border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 2rem; text-align: left;">
+          <div style="display:flex; justify-content:space-between; margin-bottom: 0.5rem;">
+            <span style="color: var(--text-muted);">Order ID:</span>
+            <strong id="confirmed-order-id" style="color: var(--secondary);">#ORD-XXXX</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color: var(--text-muted);">Status:</span>
+            <span class="badge badge-success">PAID</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+          <a href="orders.html" class="btn btn-primary">View All Orders</a>
+          <a href="home.html" class="btn btn-outline">Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    Auth.requireAuth(["STUDENT", "FACULTY"]);
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get("orderId");
+    if (orderId) {
+      document.getElementById("confirmed-order-id").textContent = `#${orderId.slice(0, 8).toUpperCase()}`;
+    }
+  </script>
+</body>
+</html>

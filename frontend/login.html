@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - UEM EATS V2</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <!-- Supabase JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo-icon">🍱</div>
+        <h1>Welcome Back</h1>
+        <p>Sign in to your UEM EATS account</p>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Campus Email Address</label>
+          <input type="email" id="email" class="form-control" placeholder="name@uem.edu.in" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" id="login-btn" class="btn btn-primary btn-block">Sign In</button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="register.html">Sign Up here</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const btn = document.getElementById("login-btn");
+
+      btn.disabled = true;
+      btn.textContent = "Signing in...";
+
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+
+        // Fetch profile
+        const { data: profile, error: pError } = await supabaseClient
+          .from("profiles")
+          .select("*")
+          .eq("id", data.user.id)
+          .single();
+
+        if (pError || !profile) {
+          throw new Error("Unable to retrieve user profile");
+        }
+
+        Auth.setSession(data.session.access_token, profile);
+        UEM.showToast(`Welcome back, ${profile.name}!`, "success");
+        setTimeout(() => Auth.redirectByRole(profile.role), 500);
+      } catch (err) {
+        UEM.showToast(err.message, "error");
+        btn.disabled = false;
+        btn.textContent = "Sign In";
+      }
+    });
+  </script>
+</body>
+</html>

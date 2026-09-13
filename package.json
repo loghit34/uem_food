@@ -1,0 +1,17 @@
+﻿{
+  "name": "uem-eats-v2",
+  "version": "2.0.0",
+  "description": "UEM EATS V2 - Campus Food Ordering Platform",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "razorpay": "^2.9.4"
+  }
+}

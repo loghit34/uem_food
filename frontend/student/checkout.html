@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - UEM EATS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/student.css">
+  <!-- Razorpay Checkout Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="home.html" class="brand-logo">
+        🍱 UEM<span>EATS</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="home.html" class="nav-link">Home</a></li>
+          <li><a href="orders.html" class="nav-link">My Orders</a></li>
+          <li><button onclick="Auth.logout()" class="btn btn-outline btn-sm">Logout</button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container" style="max-width: 800px;">
+      <h1 class="section-title">Order Checkout & Payment</h1>
+      <div id="checkout-container">
+        <!-- Rendered via checkout.js & payment.js -->
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/student/payment.js"></script>
+  <script src="../js/student/checkout.js"></script>
+</body>
+</html>

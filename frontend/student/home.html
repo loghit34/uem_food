@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - UEM EATS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/student.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="home.html" class="brand-logo">
+        🍱 UEM<span>EATS</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="home.html" class="nav-link active">Home</a></li>
+          <li><a href="vendors.html" class="nav-link">Canteens</a></li>
+          <li><a href="orders.html" class="nav-link">My Orders</a></li>
+          <li class="cart-badge-wrap">
+            <a href="cart.html" class="nav-link">🛒 Cart <span id="cart-count-badge" class="cart-count" style="display:none;">0</span></a>
+          </li>
+          <li><span id="nav-user-name" style="font-weight: 600; color: var(--secondary);"></span></li>
+          <li><button onclick="Auth.logout()" class="btn btn-outline btn-sm">Logout</button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="hero-banner">
+        <h1>Welcome, <span id="welcome-name">Foodie</span>! 👋</h1>
+        <p>Order fresh campus meals without waiting in canteen lines.</p>
+        <div class="search-bar-wrap">
+          <input type="text" id="home-search" placeholder="Search biryani, coffee, rolls, thali...">
+          <a href="vendors.html" class="btn btn-primary" style="background: white; color: var(--primary);">Find Food</a>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <span>Campus Outlets</span>
+        <a href="vendors.html" style="font-size: 0.95rem; color: var(--primary);">View All &rarr;</a>
+      </div>
+
+      <div id="featured-vendors" class="grid-cards">
+        <!-- Dynamic vendor cards -->
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 UEM EATS V2</p>
+    </div>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/student/home.js"></script>
+</body>
+</html>
