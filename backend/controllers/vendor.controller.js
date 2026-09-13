@@ -58,10 +58,13 @@ const getAnalytics = async (req, res) => {
       .from("vendors")
       .select("id")
       .eq("owner_id", req.user.id)
-      .single();
+      .maybeSingle();
 
-    if (error || !vendor) {
-      return errorResponse(res, "Vendor record not found for this account", 404);
+    // No store yet - return zeroed metrics gracefully
+    if (!vendor) {
+      return successResponse(res, {
+        todayOrders: 0, todaySales: 0, totalOrders: 0, totalSales: 0
+      }, "No vendor store linked yet");
     }
 
     const metrics = await getVendorAnalytics(vendor.id);

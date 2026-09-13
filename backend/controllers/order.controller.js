@@ -1,4 +1,4 @@
-﻿const { successResponse, errorResponse } = require("../utils/response");
+const { successResponse, errorResponse } = require("../utils/response");
 const { getUserOrders, getVendorOrders } = require("../services/order.service");
 const { supabaseAdmin } = require("../config/supabase");
 
@@ -23,10 +23,13 @@ const getVendorIncomingOrders = async (req, res) => {
       .from("vendors")
       .select("id")
       .eq("owner_id", req.user.id)
-      .single();
+      .maybeSingle(); // returns null instead of error if not found
 
-    if (error || !vendor) {
-      return errorResponse(res, "Vendor profile not found", 404);
+    if (error) return errorResponse(res, error.message, 400);
+
+    // No vendor store yet - return empty array gracefully
+    if (!vendor) {
+      return successResponse(res, [], "No vendor store linked to this account yet");
     }
 
     const orders = await getVendorOrders(vendor.id);
