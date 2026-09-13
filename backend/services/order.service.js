@@ -1,4 +1,71 @@
-﻿const { supabaseAdmin } = require("../config/supabase");
+const { supabaseAdmin } = require("../config/supabase");
+
+/**
+ * Server-Side Price Verification:
+ * Fetches actual menu item prices from Database to prevent client price manipulation.
+ */
+const validateAndCalculateOrderItems = async (vendorId, clientItems) => {
+  if (!clientItems || !clientItems.length) {
+    throw new Error("Order items list cannot be empty");
+  }
+
+  const itemIds = clientItems.map((item) => item.id).filter(Boolean);
+  if (itemIds.length !== clientItems.length) {
+    throw new Error("Invalid items in cart");
+  }
+
+  // Fetch true items directly from Database
+  const { data: dbItems, error } = await supabaseAdmin
+    .from("menu_items")
+    .select("id, vendor_id, name, price, is_available")
+    .in("id", itemIds);
+
+  if (error) {
+    throw new Error(`Database price fetch failed: ${error.message}`);
+  }
+
+  const dbItemsMap = new Map();
+  dbItems.forEach((item) => dbItemsMap.set(item.id, item));
+
+  let verifiedTotal = 0;
+  const verifiedItems = [];
+
+  for (const clientItem of clientItems) {
+    const dbItem = dbItemsMap.get(clientItem.id);
+
+    if (!dbItem) {
+      throw new Error(`Item "${clientItem.name || 'Unknown'}" not found in canteen menu`);
+    }
+
+    if (dbItem.vendor_id !== vendorId) {
+      throw new Error(`Item "${dbItem.name}" does not belong to this canteen`);
+    }
+
+    if (!dbItem.is_available) {
+      throw new Error(`Item "${dbItem.name}" is currently sold out`);
+    }
+
+    const quantity = parseInt(clientItem.quantity, 10);
+    if (isNaN(quantity) || quantity <= 0) {
+      throw new Error(`Invalid quantity for "${dbItem.name}"`);
+    }
+
+    const itemPrice = parseFloat(dbItem.price);
+    verifiedTotal += itemPrice * quantity;
+
+    verifiedItems.push({
+      id: dbItem.id,
+      name: dbItem.name,
+      price: itemPrice, // Official DB price
+      quantity: quantity,
+    });
+  }
+
+  return {
+    verifiedItems,
+    totalAmount: Math.round(verifiedTotal * 100) / 100,
+  };
+};
 
 /**
  * Creates a verified PAID order and its associated order items & payment record
@@ -21,7 +88,7 @@ const createPaidOrder = async ({ userId, vendorId, totalAmount, paymentId, razor
 
   if (orderError) throw new Error(`Failed to create order: ${orderError.message}`);
 
-  // 2. Insert Order Items
+  // 2. Insert Order Items using verified prices
   const orderItemsData = items.map((item) => ({
     order_id: order.id,
     menu_item_id: item.id || null,
@@ -114,6 +181,7 @@ const getVendorOrders = async (vendorId) => {
 };
 
 module.exports = {
+  validateAndCalculateOrderItems,
   createPaidOrder,
   getUserOrders,
   getVendorOrders,
