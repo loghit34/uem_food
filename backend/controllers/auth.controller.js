@@ -1,9 +1,13 @@
-﻿const { supabaseAdmin } = require("../config/supabase");
+const { supabaseAdmin } = require("../config/supabase");
 const { successResponse, errorResponse } = require("../utils/response");
-const { isValidEmail, isValidRole } = require("../utils/validation");
+const { isValidEmail } = require("../utils/validation");
+
+// Roles allowed via public self-registration
+const SELF_REGISTER_ROLES = ["STUDENT", "FACULTY"];
 
 /**
- * Sync user profile upon signup
+ * Sync user profile upon signup.
+ * VENDOR and ADMIN roles are blocked here - they can only be created by Admin.
  */
 const syncProfile = async (req, res) => {
   try {
@@ -17,8 +21,13 @@ const syncProfile = async (req, res) => {
       return errorResponse(res, "Invalid email address", 400);
     }
 
-    if (!isValidRole(role)) {
-      return errorResponse(res, "Invalid user role", 400);
+    // Block VENDOR and ADMIN from self-registering
+    if (!SELF_REGISTER_ROLES.includes(role)) {
+      return errorResponse(
+        res,
+        "Vendor and Admin accounts can only be created by the platform administrator.",
+        403
+      );
     }
 
     const { data, error } = await supabaseAdmin
@@ -31,17 +40,65 @@ const syncProfile = async (req, res) => {
       return errorResponse(res, error.message, 400);
     }
 
-    // If role is VENDOR, check/create default vendor record if vendor_name is provided
-    if (role === "VENDOR" && req.body.vendor_name) {
-      await supabaseAdmin.from("vendors").upsert({
-        owner_id: id,
-        vendor_name: req.body.vendor_name,
-        location: req.body.location || "Campus Canteen",
-        description: req.body.description || "Campus Food Outlet",
-      });
+    return successResponse(res, data, "Profile synchronized successfully", 200);
+  } catch (err) {
+    return errorResponse(res, err.message, 500);
+  }
+};
+
+/**
+ * Admin-only: Create a vendor account
+ */
+const createVendorAccount = async (req, res) => {
+  try {
+    const { email, name, password, vendor_name, location, description } = req.body;
+
+    if (!email || !name || !password || !vendor_name) {
+      return errorResponse(res, "email, name, password, and vendor_name are required", 400);
     }
 
-    return successResponse(res, data, "Profile synchronized successfully", 200);
+    // Create Supabase Auth user for the vendor
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { name, role: "VENDOR" },
+    });
+
+    if (authError) return errorResponse(res, authError.message, 400);
+
+    const userId = authData.user.id;
+
+    // Create profile with VENDOR role
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from("profiles")
+      .insert({ id: userId, email, name, role: "VENDOR" })
+      .select()
+      .single();
+
+    if (profileError) return errorResponse(res, profileError.message, 400);
+
+    // Create vendor store record
+    const { data: vendor, error: vendorError } = await supabaseAdmin
+      .from("vendors")
+      .insert({
+        owner_id: userId,
+        vendor_name,
+        location: location || "Campus",
+        description: description || "Campus Food Outlet",
+        is_active: true,
+      })
+      .select()
+      .single();
+
+    if (vendorError) return errorResponse(res, vendorError.message, 400);
+
+    return successResponse(
+      res,
+      { profile, vendor },
+      `Vendor account for "${vendor_name}" created successfully`,
+      201
+    );
   } catch (err) {
     return errorResponse(res, err.message, 500);
   }
@@ -56,5 +113,6 @@ const getMe = async (req, res) => {
 
 module.exports = {
   syncProfile,
+  createVendorAccount,
   getMe,
 };

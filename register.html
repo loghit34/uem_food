@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -33,19 +33,11 @@
           <select id="role" class="form-control" required>
             <option value="STUDENT">Student</option>
             <option value="FACULTY">Faculty Member</option>
-            <option value="VENDOR">Campus Food Vendor</option>
+            <!--
+              VENDOR registration is intentionally removed from public sign-up.
+              Only the Admin can create vendor accounts from the Admin Panel.
+            -->
           </select>
-        </div>
-
-        <div id="vendor-fields" style="display: none;">
-          <div class="form-group">
-            <label for="vendor_name">Vendor / Stall Name</label>
-            <input type="text" id="vendor_name" class="form-control" placeholder="e.g. SAC Cafe">
-          </div>
-          <div class="form-group">
-            <label for="location">Campus Location</label>
-            <input type="text" id="location" class="form-control" placeholder="e.g. Block B Food Court">
-          </div>
         </div>
 
         <div class="form-group">
@@ -68,21 +60,19 @@
   <script>
     const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
 
-    // Toggle vendor fields when role is VENDOR
-    document.getElementById("role").addEventListener("change", (e) => {
-      const isVendor = e.target.value === "VENDOR";
-      document.getElementById("vendor-fields").style.display = isVendor ? "block" : "none";
-    });
-
     document.getElementById("register-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const name = document.getElementById("name").value.trim();
       const email = document.getElementById("email").value.trim();
       const role = document.getElementById("role").value;
-      const vendorName = document.getElementById("vendor_name").value.trim();
-      const location = document.getElementById("location").value.trim();
       const password = document.getElementById("password").value;
       const btn = document.getElementById("register-btn");
+
+      // Extra safety: block vendor/admin role from being set via frontend manipulation
+      if (role === "VENDOR" || role === "ADMIN") {
+        UEM.showToast("You cannot register as a Vendor or Admin here.", "error");
+        return;
+      }
 
       btn.disabled = true;
       btn.textContent = "Creating account...";
@@ -99,7 +89,7 @@
 
         if (authError) throw authError;
 
-        // Step 2: Sync profile in DB via backend
+        // Step 2: Sync profile to DB via backend
         await UEM.apiFetch("/auth/sync-profile", {
           method: "POST",
           body: JSON.stringify({
@@ -107,8 +97,6 @@
             email,
             name,
             role,
-            vendor_name: vendorName,
-            location: location,
           })
         });
 

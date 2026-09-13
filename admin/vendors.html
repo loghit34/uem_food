@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -11,36 +11,83 @@
   <header class="navbar">
     <div class="container nav-container">
       <a href="dashboard.html" class="brand-logo">👑 UEM<span>EATS Admin</span></a>
-      <a href="dashboard.html" class="btn btn-outline btn-sm">&larr; Back to Dashboard</a>
+      <div style="display:flex; gap: 1rem; align-items: center;">
+        <span id="nav-user-name" style="font-weight: 600; color: var(--secondary);"></span>
+        <a href="dashboard.html" class="btn btn-outline btn-sm">&larr; Dashboard</a>
+        <button onclick="Auth.logout()" class="btn btn-outline btn-sm">Logout</button>
+      </div>
     </div>
   </header>
 
   <main class="main-content">
     <div class="container">
-      <h1 class="section-title">Campus Food Outlets & Vendors</h1>
-      <div id="vendors-table-wrap">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Vendor Name</th>
-              <th>Location</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="vendors-tbody">
-            <!-- Loaded via JS -->
-          </tbody>
-        </table>
+
+      <!-- Create Vendor Account Form -->
+      <div class="section-title">
+        <span>Create New Vendor Account</span>
       </div>
+
+      <div class="card" style="max-width: 640px; padding: 2rem; margin-bottom: 2.5rem;">
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+          ℹ️ Only admins can create vendor accounts. The vendor will use these credentials to log in and manage their canteen.
+        </p>
+        <form id="create-vendor-form">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Vendor Owner Name</label>
+              <input type="text" id="v-name" class="form-control" placeholder="e.g. Ramesh Kumar" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Canteen / Stall Name</label>
+              <input type="text" id="v-vendor-name" class="form-control" placeholder="e.g. Main Canteen" required>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Login Email</label>
+              <input type="email" id="v-email" class="form-control" placeholder="canteen@uem.edu.in" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Login Password</label>
+              <input type="password" id="v-password" class="form-control" placeholder="min 6 characters" minlength="6" required>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Location in Campus</label>
+              <input type="text" id="v-location" class="form-control" placeholder="e.g. Ground Floor, Block A">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Description</label>
+              <input type="text" id="v-description" class="form-control" placeholder="e.g. North Indian & South Indian meals">
+            </div>
+          </div>
+          <button type="submit" id="create-vendor-btn" class="btn btn-primary">Create Vendor Account</button>
+        </form>
+        <div id="create-vendor-result" style="margin-top: 1rem;"></div>
+      </div>
+
+      <!-- Existing Vendors Table -->
+      <div class="section-title">All Registered Vendors</div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Canteen Name</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="vendors-tbody">
+          <tr><td colspan="4" style="text-align:center; color: var(--text-muted);">Loading...</td></tr>
+        </tbody>
+      </table>
     </div>
   </main>
 
   <script src="../js/config.js"></script>
   <script src="../js/common.js"></script>
   <script src="../js/auth.js"></script>
-  <script>
-    Auth.requireAuth(["ADMIN"]);
-  </script>
+  <script src="../js/admin/vendors.js"></script>
 </body>
 </html>
