@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cart View & Operations
  */
 document.addEventListener("DOMContentLoaded", () => {
@@ -27,59 +27,53 @@ function renderCart() {
   const subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
 
   container.innerHTML = `
-    <div style="margin-bottom: 1rem;">
-      <strong>Ordering from:</strong> <span style="color: var(--primary); font-weight: 700;">${cart.vendorName}</span>
+    <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 0.85rem 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
+      <div>
+        <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Ordering from</span>
+        <strong style="color: var(--primary); font-size: 1.05rem;">🍱 ${cart.vendorName}</strong>
+      </div>
+      <a href="menu.html?vendorId=${cart.vendorId}" class="btn btn-outline btn-sm">+ Add More</a>
     </div>
 
     <div class="cart-layout">
-      <div class="card" style="padding: 1.5rem;">
-        <table class="cart-items-table">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Total</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${cart.items.map(item => `
-              <tr>
-                <td><strong>${item.name}</strong></td>
-                <td>${UEM.formatCurrency(item.price)}</td>
-                <td>
-                  <div class="qty-control">
-                    <button class="qty-btn" onclick="updateItemQty('${item.id}', -1)">-</button>
-                    <span class="qty-val">${item.quantity}</span>
-                    <button class="qty-btn" onclick="updateItemQty('${item.id}', 1)">+</button>
-                  </div>
-                </td>
-                <td><strong>${UEM.formatCurrency(item.price * item.quantity)}</strong></td>
-                <td>
-                  <button onclick="removeItem('${item.id}')" style="color: var(--danger); font-size: 1.1rem;">&times;</button>
-                </td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
+      <div>
+        ${cart.items.map(item => `
+          <div class="cart-item-card">
+            <div class="cart-item-details">
+              <h4 class="cart-item-name">${item.name}</h4>
+              <div class="cart-item-price">
+                ${UEM.formatCurrency(item.price)} &times; ${item.quantity} = <strong>${UEM.formatCurrency(item.price * item.quantity)}</strong>
+              </div>
+            </div>
+            <div class="cart-item-actions">
+              <div class="food-stepper">
+                <button class="stepper-btn" onclick="updateItemQty('${item.id}', -1)">-</button>
+                <span class="stepper-val">${item.quantity}</span>
+                <button class="stepper-btn" onclick="updateItemQty('${item.id}', 1)">+</button>
+              </div>
+              <button class="delete-item-btn" onclick="removeItem('${item.id}')" title="Remove Item">&times;</button>
+            </div>
+          </div>
+        `).join("")}
       </div>
 
       <div class="summary-card">
         <h3 style="margin-bottom: 1rem; color: var(--secondary);">Order Summary</h3>
         <div class="summary-row">
-          <span>Subtotal</span>
+          <span>Item Total</span>
           <span>${UEM.formatCurrency(subtotal)}</span>
         </div>
         <div class="summary-row">
           <span>Convenience Fee</span>
-          <span>₹0.00</span>
+          <span style="color: var(--accent); font-weight: 600;">FREE</span>
         </div>
         <div class="summary-row summary-total">
-          <span>Total Amount</span>
-          <span>${UEM.formatCurrency(subtotal)}</span>
+          <span>To Pay</span>
+          <span style="color: var(--primary);">${UEM.formatCurrency(subtotal)}</span>
         </div>
-        <button onclick="window.location.href='checkout.html'" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">Proceed to Checkout</button>
+        <button onclick="window.location.href='checkout.html'" class="btn btn-primary btn-block" style="margin-top: 1.5rem; padding: 0.9rem; font-size: 1.05rem;">
+          Proceed to Checkout &rarr;
+        </button>
       </div>
     </div>
   `;

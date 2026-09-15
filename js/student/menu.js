@@ -1,7 +1,9 @@
-﻿/**
- * Canteen Menu Logic
+/**
+ * Canteen Menu Logic with In-Menu Stepper & Floating Cart Bar
  */
 let currentVendor = null;
+let allMenuItems = [];
+let activeMenuCategory = "ALL";
 
 document.addEventListener("DOMContentLoaded", async () => {
   if (!Auth.requireAuth(["STUDENT", "FACULTY"])) return;
@@ -16,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadVendorHeader(vendorId);
   await loadMenuItems(vendorId);
+  updateFloatingCartBar();
 });
 
 async function loadVendorHeader(vendorId) {
@@ -36,14 +39,69 @@ async function loadMenuItems(vendorId) {
   try {
     container.innerHTML = `<p style="color:var(--text-muted);">Loading delicious items...</p>`;
     const res = await UEM.apiFetch(`/menu/vendor/${vendorId}`);
-    const items = res.data || [];
+    allMenuItems = res.data || [];
+    renderMenuItems();
+  } catch (err) {
+    container.innerHTML = `<p style="color:var(--danger);">Failed to load menu: ${err.message}</p>`;
+  }
+}
 
-    if (items.length === 0) {
-      container.innerHTML = `<p style="color:var(--text-muted);">No items available for this canteen yet.</p>`;
-      return;
+function filterMenuCategory(cat) {
+  activeMenuCategory = cat;
+  const chips = document.querySelectorAll("#menu-category-chips .category-chip");
+  chips.forEach((c) => {
+    c.classList.toggle("active", c.textContent.toUpperCase().includes(cat));
+  });
+  renderMenuItems();
+}
+
+function renderMenuItems() {
+  const container = document.getElementById("menu-items-grid");
+  if (!container) return;
+
+  const cart = UEM.getCart();
+  const isCurrentVendorCart = cart.vendorId === currentVendor?.id;
+
+  const filtered = allMenuItems.filter(item => {
+    if (activeMenuCategory === "ALL") return true;
+    return (item.category && item.category.toUpperCase().includes(activeMenuCategory)) ||
+           (item.name && item.name.toUpperCase().includes(activeMenuCategory));
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted);">
+        <p style="font-size: 1.5rem; margin-bottom: 0.5rem;">🍽️</p>
+        <p>No items in this category.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => {
+    const cartItem = isCurrentVendorCart ? cart.items.find(i => i.id === item.id) : null;
+    const qty = cartItem ? cartItem.quantity : 0;
+
+    let actionButton = "";
+    if (!item.is_available) {
+      actionButton = `<span class="badge badge-warning">Sold Out</span>`;
+    } else if (qty > 0) {
+      actionButton = `
+        <div class="food-stepper">
+          <button class="stepper-btn" onclick="stepItemQty('${item.id}', -1)">-</button>
+          <span class="stepper-val">${qty}</span>
+          <button class="stepper-btn" onclick="stepItemQty('${item.id}', 1)">+</button>
+        </div>
+      `;
+    } else {
+      actionButton = `
+        <button onclick="addItem('${item.id}', '${escapeHtml(item.name)}', ${item.price}, '${item.image || ''}')" class="btn btn-primary btn-sm">
+          + Add
+        </button>
+      `;
     }
 
-    container.innerHTML = items.map(item => `
+    return `
       <div class="card food-card">
         <img src="${item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500'}" alt="${item.name}" class="food-img">
         <div class="food-details">
@@ -52,17 +110,12 @@ async function loadMenuItems(vendorId) {
           <p class="food-desc">${item.description || ''}</p>
           <div class="food-price-action">
             <span class="food-price">${UEM.formatCurrency(item.price)}</span>
-            ${item.is_available 
-              ? `<button onclick="addItem('${item.id}', '${escapeHtml(item.name)}', ${item.price}, '${item.image || ''}')" class="btn btn-primary btn-sm">+ Add</button>`
-              : `<span class="badge badge-warning">Sold Out</span>`
-            }
+            ${actionButton}
           </div>
         </div>
       </div>
-    `).join("");
-  } catch (err) {
-    container.innerHTML = `<p style="color:var(--danger);">Failed to load menu: ${err.message}</p>`;
-  }
+    `;
+  }).join("");
 }
 
 function addItem(id, name, price, image) {
@@ -71,8 +124,46 @@ function addItem(id, name, price, image) {
     { id, name, price, image },
     { id: currentVendor.id, name: currentVendor.vendor_name }
   );
+  renderMenuItems();
+  updateFloatingCartBar();
+}
+
+function stepItemQty(itemId, delta) {
+  let cart = UEM.getCart();
+  const index = cart.items.findIndex(i => i.id === itemId);
+  if (index > -1) {
+    cart.items[index].quantity += delta;
+    if (cart.items[index].quantity <= 0) {
+      cart.items.splice(index, 1);
+    }
+    if (cart.items.length === 0) {
+      cart.vendorId = null;
+      cart.vendorName = "";
+    }
+    UEM.saveCart(cart);
+    renderMenuItems();
+    updateFloatingCartBar();
+  }
+}
+
+function updateFloatingCartBar() {
+  const bar = document.getElementById("floating-cart-bar");
+  if (!bar) return;
+
+  const cart = UEM.getCart();
+  const totalItems = cart.items.reduce((sum, i) => sum + i.quantity, 0);
+  const totalAmount = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+
+  if (totalItems > 0 && cart.vendorId === currentVendor?.id) {
+    document.getElementById("floating-cart-count").textContent = `${totalItems} item${totalItems > 1 ? 's' : ''} in cart`;
+    document.getElementById("floating-cart-total").textContent = UEM.formatCurrency(totalAmount);
+    bar.style.display = "flex";
+  } else {
+    bar.style.display = "none";
+  }
 }
 
 function escapeHtml(str) {
   return (str || "").replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
+

@@ -96,12 +96,14 @@ const UEM = {
   },
 
   updateCartBadge() {
-    const badge = document.getElementById("cart-count-badge");
-    if (!badge) return;
     const cart = UEM.getCart();
     const count = cart.items.reduce((sum, item) => sum + item.quantity, 0);
-    badge.textContent = count;
-    badge.style.display = count > 0 ? "inline-block" : "none";
+
+    const badges = document.querySelectorAll("#cart-count-badge, .mobile-nav-badge");
+    badges.forEach((badge) => {
+      badge.textContent = count;
+      badge.style.display = count > 0 ? "inline-block" : "none";
+    });
   },
 
   // Authenticated API Fetch Wrapper
