@@ -1,5 +1,5 @@
 const { successResponse, errorResponse } = require("../utils/response");
-const { getUserOrders, getVendorOrders } = require("../services/order.service");
+const { getUserOrders, getVendorOrders, getAllOrders } = require("../services/order.service");
 const { supabaseAdmin } = require("../config/supabase");
 
 /**
@@ -39,7 +39,20 @@ const getVendorIncomingOrders = async (req, res) => {
   }
 };
 
+/**
+ * Get all orders (Admin only)
+ */
+const getAllAdminOrders = async (req, res) => {
+  try {
+    const orders = await getAllOrders();
+    return successResponse(res, orders, "All campus orders retrieved");
+  } catch (err) {
+    return errorResponse(res, err.message, 500);
+  }
+};
+
 module.exports = {
   getMyOrders,
   getVendorIncomingOrders,
+  getAllAdminOrders,
 };

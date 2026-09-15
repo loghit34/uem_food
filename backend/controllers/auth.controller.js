@@ -105,14 +105,25 @@ const createVendorAccount = async (req, res) => {
 };
 
 /**
- * Get currently authenticated user profile
+ * Admin only: Get all registered campus users
  */
-const getMe = async (req, res) => {
-  return successResponse(res, req.user, "User details fetched successfully");
+const getAllUsers = async (req, res) => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("profiles")
+      .select("id, email, name, role, created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) return errorResponse(res, error.message, 400);
+    return successResponse(res, data, "All registered campus users retrieved");
+  } catch (err) {
+    return errorResponse(res, err.message, 500);
+  }
 };
 
 module.exports = {
   syncProfile,
   createVendorAccount,
   getMe,
+  getAllUsers,
 };

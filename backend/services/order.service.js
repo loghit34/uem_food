@@ -180,9 +180,44 @@ const getVendorOrders = async (vendorId) => {
   return data;
 };
 
+/**
+ * Fetch all campus orders for Admin
+ */
+const getAllOrders = async () => {
+  const { data, error } = await supabaseAdmin
+    .from("orders")
+    .select(`
+      id,
+      total_amount,
+      status,
+      payment_id,
+      created_at,
+      profiles (
+        name,
+        email,
+        role
+      ),
+      vendors (
+        vendor_name,
+        location
+      ),
+      order_items (
+        id,
+        item_name,
+        price,
+        quantity
+      )
+    `)
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data;
+};
+
 module.exports = {
   validateAndCalculateOrderItems,
   createPaidOrder,
   getUserOrders,
   getVendorOrders,
+  getAllOrders,
 };

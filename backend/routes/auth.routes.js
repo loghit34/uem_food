@@ -18,4 +18,12 @@ router.post(
   authController.createVendorAccount
 );
 
+// Admin only: get all registered users
+router.get(
+  "/users",
+  authenticate,
+  authorizeRoles("ADMIN"),
+  authController.getAllUsers
+);
+
 module.exports = router;

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -17,7 +17,13 @@
 
   <main class="main-content">
     <div class="container">
-      <h1 class="section-title">All Campus Orders (PAID)</h1>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h1 class="section-title" style="margin-bottom: 0;">All Campus Orders (PAID)</h1>
+        <div class="search-bar-wrap" style="margin-top: 0; max-width: 320px;">
+          <input type="text" id="order-search" placeholder="Search order ID, vendor, student...">
+        </div>
+      </div>
+
       <div id="orders-table-wrap">
         <table class="admin-table">
           <thead>
@@ -40,8 +46,6 @@
   <script src="../js/config.js"></script>
   <script src="../js/common.js"></script>
   <script src="../js/auth.js"></script>
-  <script>
-    Auth.requireAuth(["ADMIN"]);
-  </script>
+  <script src="../js/admin/orders.js"></script>
 </body>
 </html>
