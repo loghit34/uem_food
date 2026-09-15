@@ -1,8 +1,8 @@
-﻿require("dotenv").config();
+require("dotenv").config();
 const Razorpay = require("razorpay");
 
-const key_id = process.env.RAZORPAY_KEY_ID || "rzp_test_placeholder";
-const key_secret = process.env.RAZORPAY_KEY_SECRET || "rzp_test_placeholder_secret";
+const key_id = (process.env.RAZORPAY_KEY_ID || "rzp_test_placeholder").trim();
+const key_secret = (process.env.RAZORPAY_KEY_SECRET || "rzp_test_placeholder_secret").trim();
 
 const razorpay = new Razorpay({
   key_id,

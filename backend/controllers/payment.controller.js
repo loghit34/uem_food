@@ -38,7 +38,9 @@ const initiatePayment = async (req, res) => {
       "Razorpay order created with verified prices"
     );
   } catch (err) {
-    return errorResponse(res, `Failed to create payment order: ${err.message}`, 400);
+    console.error("Payment initiation error:", err);
+    const errorMsg = err?.error?.description || err?.message || (typeof err === "object" ? JSON.stringify(err) : String(err));
+    return errorResponse(res, `Failed to create payment order: ${errorMsg}`, 400);
   }
 };
 
@@ -95,7 +97,9 @@ const verifyAndCreateOrder = async (req, res) => {
       201
     );
   } catch (err) {
-    return errorResponse(res, `Order verification error: ${err.message}`, 400);
+    console.error("Order verification error:", err);
+    const errorMsg = err?.error?.description || err?.message || (typeof err === "object" ? JSON.stringify(err) : String(err));
+    return errorResponse(res, `Order verification error: ${errorMsg}`, 400);
   }
 };
 
