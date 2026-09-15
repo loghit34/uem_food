@@ -470,14 +470,6 @@ input, select, textarea {
   .footer {
     display: none; /* Clean app experience on mobile */
   }
-
-  .mobile-header-auth {
-    display: flex !important;
-  }
-}
-
-.mobile-header-auth {
-  display: none;
 }
 
 
