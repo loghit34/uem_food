@@ -1,4 +1,4 @@
-﻿/**
+/**
  * UEM EATS V2 - Common Utilities & Helpers
  */
 const UEM = {
@@ -124,6 +124,12 @@ const UEM = {
 
       const data = await response.json();
       if (!response.ok) {
+        if (response.status === 401) {
+          UEM.showToast("Your login session has expired. Please sign in again.", "warning");
+          setTimeout(() => {
+            if (window.Auth) Auth.logout();
+          }, 1500);
+        }
         throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
       return data;
