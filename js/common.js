@@ -124,7 +124,14 @@ const UEM = {
         headers,
       });
 
-      const data = await response.json();
+      const rawText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        data = { message: rawText || `Server returned status ${response.status}` };
+      }
+
       if (!response.ok) {
         if (response.status === 401) {
           UEM.showToast("Your login session has expired. Please sign in again.", "warning");

@@ -121,6 +121,13 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+/**
+ * Get currently authenticated user profile
+ */
+const getMe = async (req, res) => {
+  return successResponse(res, req.user, "User details fetched successfully");
+};
+
 module.exports = {
   syncProfile,
   createVendorAccount,
