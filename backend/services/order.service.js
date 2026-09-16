@@ -103,7 +103,7 @@ const createPaidOrder = async ({
     const { data: existingPayment } = await supabaseAdmin
       .from("payments")
       .select("order_id")
-      .eq("razorpay_payment_id", effectiveTxnId)
+      .eq("transaction_id", effectiveTxnId)
       .maybeSingle();
 
     if (existingPayment && existingPayment.order_id) {
@@ -154,8 +154,8 @@ const createPaidOrder = async ({
     .insert([
       {
         order_id: order.id,
-        razorpay_order_id: effectiveMerchantTxnId,
-        razorpay_payment_id: effectiveTxnId,
+        merchant_transaction_id: effectiveMerchantTxnId,
+        transaction_id: effectiveTxnId,
         amount: totalAmount,
         status: "SUCCESS",
       },

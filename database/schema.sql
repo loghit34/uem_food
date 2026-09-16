@@ -64,8 +64,8 @@ CREATE TABLE IF NOT EXISTS order_items (
 CREATE TABLE IF NOT EXISTS payments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
-    razorpay_order_id TEXT NOT NULL, -- Merchant Transaction ID (PhonePe merchantTransactionId)
-    razorpay_payment_id TEXT NOT NULL, -- PhonePe Payment/Transaction ID (PhonePe transactionId)
+    merchant_transaction_id TEXT NOT NULL,
+    transaction_id TEXT NOT NULL,
     amount NUMERIC(10, 2) NOT NULL CHECK (amount >= 0),
     status TEXT NOT NULL DEFAULT 'SUCCESS',
     created_at TIMESTAMPTZ DEFAULT NOW()

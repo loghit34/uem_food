@@ -47,9 +47,9 @@ const initiatePayment = async (req, res) => {
     // Temporarily store pending transaction metadata in DB for callback verification
     await supabaseAdmin.from("payments").insert([
       {
-        order_id: null, // will be filled after payment confirmation
-        razorpay_order_id: merchantTransactionId, // PhonePe merchantTransactionId
-        razorpay_payment_id: "PENDING", // PhonePe transaction status
+        order_id: null,
+        merchant_transaction_id: merchantTransactionId,
+        transaction_id: "PENDING",
         amount: totalAmount,
         status: "PENDING",
       },
@@ -131,7 +131,7 @@ const confirmAndCreateOrder = async (req, res) => {
     const { data: existingPayment } = await supabaseAdmin
       .from("payments")
       .select("order_id, status")
-      .eq("razorpay_order_id", merchantTransactionId)
+      .eq("merchant_transaction_id", merchantTransactionId)
       .maybeSingle();
 
     if (existingPayment && existingPayment.order_id) {
