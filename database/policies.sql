@@ -1,4 +1,4 @@
-﻿-- ========================================================
+-- ========================================================
 -- UEM EATS V2 - Row Level Security (RLS) Policies
 -- ========================================================
 
@@ -11,14 +11,33 @@ ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
 -- 1. Profiles Policies
-CREATE POLICY "Public profiles are viewable by authenticated users"
-ON profiles FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Users can view their own profile"
+ON profiles FOR SELECT TO authenticated
+USING (auth.uid() = id);
 
 CREATE POLICY "Users can insert their own profile"
 ON profiles FOR INSERT TO authenticated WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "Users can update their own profile"
-ON profiles FOR UPDATE TO authenticated USING (auth.uid() = id);
+ON profiles FOR UPDATE TO authenticated
+USING (auth.uid() = id);
+
+-- Prevent unauthorized role modification on profiles
+CREATE OR REPLACE FUNCTION prevent_profile_role_escalation()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.role IS DISTINCT FROM OLD.role THEN
+    RAISE EXCEPTION 'Privilege escalation blocked: Users cannot change their own system role.';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS tr_prevent_profile_role_escalation ON profiles;
+CREATE TRIGGER tr_prevent_profile_role_escalation
+BEFORE UPDATE ON profiles
+FOR EACH ROW
+EXECUTE FUNCTION prevent_profile_role_escalation();
 
 -- 2. Vendors Policies
 CREATE POLICY "Vendors viewable by all authenticated users"

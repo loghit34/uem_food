@@ -5,6 +5,21 @@ const { supabaseAdmin } = require("../config/supabase");
  * Fetches actual menu item prices from Database to prevent client price manipulation.
  */
 const validateAndCalculateOrderItems = async (vendorId, clientItems) => {
+  if (!vendorId) {
+    throw new Error("Vendor ID is required");
+  }
+
+  // 1. Verify vendor exists and is active
+  const { data: vendor, error: vError } = await supabaseAdmin
+    .from("vendors")
+    .select("id, is_active")
+    .eq("id", vendorId)
+    .single();
+
+  if (vError || !vendor || !vendor.is_active) {
+    throw new Error("This canteen is currently inactive or closed");
+  }
+
   if (!clientItems || !clientItems.length) {
     throw new Error("Order items list cannot be empty");
   }
@@ -46,8 +61,8 @@ const validateAndCalculateOrderItems = async (vendorId, clientItems) => {
     }
 
     const quantity = parseInt(clientItem.quantity, 10);
-    if (isNaN(quantity) || quantity <= 0) {
-      throw new Error(`Invalid quantity for "${dbItem.name}"`);
+    if (isNaN(quantity) || quantity <= 0 || quantity > 50) {
+      throw new Error(`Quantity for "${dbItem.name}" must be between 1 and 50`);
     }
 
     const itemPrice = parseFloat(dbItem.price);
@@ -69,8 +84,27 @@ const validateAndCalculateOrderItems = async (vendorId, clientItems) => {
 
 /**
  * Creates a verified PAID order and its associated order items & payment record
+ * Includes idempotency check to prevent duplicate orders on double submissions.
  */
 const createPaidOrder = async ({ userId, vendorId, totalAmount, paymentId, razorpayOrderId, razorpayPaymentId, items }) => {
+  // Idempotency: Check if an order was already created for this payment ID
+  if (razorpayPaymentId) {
+    const { data: existingPayment } = await supabaseAdmin
+      .from("payments")
+      .select("order_id")
+      .eq("razorpay_payment_id", razorpayPaymentId)
+      .maybeSingle();
+
+    if (existingPayment && existingPayment.order_id) {
+      const { data: existingOrder } = await supabaseAdmin
+        .from("orders")
+        .select("*")
+        .eq("id", existingPayment.order_id)
+        .single();
+      if (existingOrder) return existingOrder;
+    }
+  }
+
   // 1. Insert Order
   const { data: order, error: orderError } = await supabaseAdmin
     .from("orders")

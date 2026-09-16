@@ -1,12 +1,16 @@
 const { successResponse, errorResponse } = require("../utils/response");
-const { createRazorpayOrder, verifyPaymentSignature } = require("../services/payment.service");
+const {
+  createPhonePePaymentRequest,
+  verifyPhonePeCallback,
+  checkPhonePePaymentStatus,
+} = require("../services/payment.service");
 const { createPaidOrder, validateAndCalculateOrderItems } = require("../services/order.service");
-const { key_id } = require("../config/razorpay");
+const { supabaseAdmin } = require("../config/supabase");
 
 /**
- * Create a Razorpay Order.
- * SECURITY: Recalculates total price on server from database menu_items
- * to prevent client-side price tampering.
+ * Step 1: Initiate PhonePe Payment.
+ * Creates a PhonePe payment request and returns the redirect URL to the frontend.
+ * SECURITY: Server recalculates total price from DB to prevent client-side price tampering.
  */
 const initiatePayment = async (req, res) => {
   try {
@@ -23,87 +27,160 @@ const initiatePayment = async (req, res) => {
       return errorResponse(res, "Total amount must be greater than zero", 400);
     }
 
-    const razorpayOrder = await createRazorpayOrder(totalAmount, `ord_${Date.now()}`);
+    // Generate unique merchant transaction ID
+    const merchantTransactionId = `UEM${Date.now()}${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+
+    const backendBase = process.env.BACKEND_URL || "https://uem-foodyy.vercel.app";
+    const frontendBase = process.env.FRONTEND_URL || "https://uem-foodyy.vercel.app";
+
+    const callbackUrl = `${backendBase}/api/payment/phonepe-callback`;
+    const redirectUrl = `${frontendBase}/student/payment-success.html?txnId=${merchantTransactionId}`;
+
+    const { redirectUrl: phonePeRedirectUrl } = await createPhonePePaymentRequest(
+      totalAmount,
+      merchantTransactionId,
+      req.user.id,
+      callbackUrl,
+      redirectUrl
+    );
+
+    // Temporarily store pending transaction metadata in DB for callback verification
+    await supabaseAdmin.from("payments").insert([
+      {
+        order_id: null, // will be filled after payment confirmation
+        razorpay_order_id: merchantTransactionId, // reusing field for txn ID
+        razorpay_payment_id: "PENDING",
+        amount: totalAmount,
+        status: "PENDING",
+      },
+    ]).select();
 
     return successResponse(
       res,
       {
-        orderId: razorpayOrder.id,
-        amount: razorpayOrder.amount, // in paise
-        currency: razorpayOrder.currency,
-        keyId: key_id,
+        redirectUrl: phonePeRedirectUrl,
+        merchantTransactionId,
         verifiedTotal: totalAmount,
         verifiedItems,
       },
-      "Razorpay order created with verified prices"
+      "PhonePe payment initiated successfully"
     );
   } catch (err) {
-    console.error("Payment initiation error:", err);
-    const errorMsg = err?.error?.description || err?.message || (typeof err === "object" ? JSON.stringify(err) : String(err));
-    return errorResponse(res, `Failed to create payment order: ${errorMsg}`, 400);
+    console.error("PhonePe payment initiation error:", err);
+    return errorResponse(res, `Failed to initiate payment: ${err.message}`, 400);
   }
 };
 
 /**
- * Verify Razorpay payment signature & record confirmed PAID order using DB verified prices
+ * Step 2: PhonePe Server-to-Server Callback (PUBLIC route — no auth).
+ * PhonePe POSTs this after payment is completed.
+ * Verifies signature, creates the order, and redirects user to success page.
  */
-const verifyAndCreateOrder = async (req, res) => {
+const phonePeCallback = async (req, res) => {
   try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      vendor_id,
-      items,
-    } = req.body;
+    const { response } = req.body;
+    const receivedChecksum = req.headers["x-verify"];
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !vendor_id || !items) {
-      return errorResponse(res, "Missing required Razorpay payment attributes", 400);
+    if (!response || !receivedChecksum) {
+      return res.status(400).json({ success: false, message: "Invalid callback payload" });
     }
 
-    // Step 1: Validate HMAC SHA256 Signature
-    const isValid = verifyPaymentSignature(
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature
-    );
-
+    // Verify PhonePe signature
+    const isValid = verifyPhonePeCallback(response, receivedChecksum);
     if (!isValid) {
-      return errorResponse(res, "Payment signature verification failed. Security alert.", 400);
+      console.error("PhonePe callback signature verification failed");
+      return res.status(400).json({ success: false, message: "Signature verification failed" });
     }
 
-    // Step 2: Recalculate true prices from Database to prevent post-payment tampering
-    const { verifiedItems, totalAmount } = await validateAndCalculateOrderItems(vendor_id, items);
+    // Decode response
+    const decoded = JSON.parse(Buffer.from(response, "base64").toString("utf-8"));
+    const { merchantTransactionId, transactionId, code } = decoded.data || decoded;
 
-    // Step 3: Create verified order with status 'PAID'
+    if (code !== "PAYMENT_SUCCESS") {
+      console.warn(`PhonePe payment not successful: ${code} — txn: ${merchantTransactionId}`);
+      return res.status(200).json({ success: false, message: `Payment status: ${code}` });
+    }
+
+    // Double-verify with PhonePe status API
+    const statusResponse = await checkPhonePePaymentStatus(merchantTransactionId);
+    if (!statusResponse.success || statusResponse.code !== "PAYMENT_SUCCESS") {
+      return res.status(400).json({ success: false, message: "Payment status verification failed" });
+    }
+
+    // Acknowledge callback to PhonePe
+    return res.status(200).json({ success: true, message: "Payment acknowledged" });
+  } catch (err) {
+    console.error("PhonePe callback error:", err);
+    return res.status(500).json({ success: false, message: "Callback processing error" });
+  }
+};
+
+/**
+ * Step 3: Frontend polls this after redirect to confirm payment and create the DB order.
+ * Called by the payment-success page with the merchantTransactionId.
+ */
+const confirmAndCreateOrder = async (req, res) => {
+  try {
+    const { merchantTransactionId, vendorId, items } = req.body;
+
+    if (!merchantTransactionId || !vendorId || !items) {
+      return errorResponse(res, "Missing confirmation parameters", 400);
+    }
+
+    // Idempotency: Check if order already created for this transaction
+    const { data: existingPayment } = await supabaseAdmin
+      .from("payments")
+      .select("order_id, status")
+      .eq("razorpay_order_id", merchantTransactionId)
+      .maybeSingle();
+
+    if (existingPayment && existingPayment.order_id) {
+      const { data: existingOrder } = await supabaseAdmin
+        .from("orders")
+        .select("*")
+        .eq("id", existingPayment.order_id)
+        .single();
+      if (existingOrder) {
+        return successResponse(res, { orderId: existingOrder.id, status: "PAID" }, "Order already confirmed");
+      }
+    }
+
+    // Verify payment status with PhonePe
+    const statusResponse = await checkPhonePePaymentStatus(merchantTransactionId);
+    if (!statusResponse.success || statusResponse.code !== "PAYMENT_SUCCESS") {
+      return errorResponse(res, "Payment not confirmed by PhonePe. Please wait or contact support.", 400);
+    }
+
+    const phonePePaymentId = statusResponse.data?.transactionId || merchantTransactionId;
+
+    // Recalculate prices from DB
+    const { verifiedItems, totalAmount } = await validateAndCalculateOrderItems(vendorId, items);
+
+    // Create the order
     const order = await createPaidOrder({
       userId: req.user.id,
-      vendorId: vendor_id,
-      totalAmount: totalAmount,
-      paymentId: razorpay_payment_id,
-      razorpayOrderId: razorpay_order_id,
-      razorpayPaymentId: razorpay_payment_id,
+      vendorId,
+      totalAmount,
+      paymentId: phonePePaymentId,
+      razorpayOrderId: merchantTransactionId,
+      razorpayPaymentId: phonePePaymentId,
       items: verifiedItems,
     });
 
     return successResponse(
       res,
-      {
-        orderId: order.id,
-        status: order.status,
-        totalAmount: order.total_amount,
-      },
+      { orderId: order.id, status: order.status, totalAmount: order.total_amount },
       "Payment verified and order placed successfully",
       201
     );
   } catch (err) {
-    console.error("Order verification error:", err);
-    const errorMsg = err?.error?.description || err?.message || (typeof err === "object" ? JSON.stringify(err) : String(err));
-    return errorResponse(res, `Order verification error: ${errorMsg}`, 400);
+    console.error("Order confirmation error:", err);
+    return errorResponse(res, `Order confirmation error: ${err.message}`, 400);
   }
 };
 
 module.exports = {
   initiatePayment,
-  verifyAndCreateOrder,
+  phonePeCallback,
+  confirmAndCreateOrder,
 };

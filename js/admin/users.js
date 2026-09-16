@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Admin - User Management
  */
 let allUsers = [];
@@ -56,13 +56,13 @@ function renderUsersTable() {
     return `
       <tr>
         <td>
-          <strong style="color:var(--secondary); font-size:0.95rem;">${u.name || 'Anonymous'}</strong>
+          <strong style="color:var(--secondary); font-size:0.95rem;">${UEM.escapeHTML(u.name || 'Anonymous')}</strong>
         </td>
         <td>
-          <span style="color:var(--text-muted); font-size:0.9rem;">${u.email}</span>
+          <span style="color:var(--text-muted); font-size:0.9rem;">${UEM.escapeHTML(u.email)}</span>
         </td>
         <td>
-          <span class="badge ${roleBadgeClass}">${u.role}</span>
+          <span class="badge ${roleBadgeClass}">${UEM.escapeHTML(u.role)}</span>
         </td>
         <td style="color:var(--text-muted); font-size:0.88rem;">
           ${UEM.formatDate(u.created_at)}

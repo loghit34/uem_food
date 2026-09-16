@@ -103,11 +103,11 @@ function renderMenuItems() {
 
     return `
       <div class="card food-card">
-        <img src="${item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500'}" alt="${item.name}" class="food-img">
+        <img src="${UEM.escapeHTML(item.image) || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500'}" alt="${UEM.escapeHTML(item.name)}" class="food-img">
         <div class="food-details">
-          <span class="food-category">${item.category || 'Special'}</span>
-          <h3 class="food-title">${item.name}</h3>
-          <p class="food-desc">${item.description || ''}</p>
+          <span class="food-category">${UEM.escapeHTML(item.category || 'Special')}</span>
+          <h3 class="food-title">${UEM.escapeHTML(item.name)}</h3>
+          <p class="food-desc">${UEM.escapeHTML(item.description || '')}</p>
           <div class="food-price-action">
             <span class="food-price">${UEM.formatCurrency(item.price)}</span>
             ${actionButton}

@@ -82,11 +82,51 @@
   <script src="../js/auth.js"></script>
   <script>
     Auth.requireAuth(["STUDENT", "FACULTY"]);
+
     const params = new URLSearchParams(window.location.search);
-    const orderId = params.get("orderId");
-    if (orderId) {
-      document.getElementById("confirmed-order-id").textContent = `#${orderId.slice(0, 8).toUpperCase()}`;
+    const txnId = params.get("txnId");
+    const orderIdParam = params.get("orderId");
+    const confirmedEl = document.getElementById("confirmed-order-id");
+
+    async function confirmPhonePeOrder() {
+      // If orderId already in URL (direct confirm), just display it
+      if (orderIdParam) {
+        confirmedEl.textContent = `#${orderIdParam.slice(0, 8).toUpperCase()}`;
+        return;
+      }
+
+      if (!txnId) {
+        confirmedEl.textContent = "#UNKNOWN";
+        return;
+      }
+
+      confirmedEl.textContent = "⏳ Verifying...";
+
+      try {
+        // Retrieve cart items saved before redirect
+        const cart = UEM.getCart();
+        const vendorId = cart.pendingVendorId || cart.vendorId;
+        const items = cart.items || [];
+
+        const res = await UEM.apiFetch("/payment/confirm", {
+          method: "POST",
+          body: JSON.stringify({
+            merchantTransactionId: txnId,
+            vendorId: vendorId,
+            items: items,
+          }),
+        });
+
+        confirmedEl.textContent = `#${res.data.orderId.slice(0, 8).toUpperCase()}`;
+        UEM.clearCart();
+        UEM.showToast("🎉 Payment verified! Order placed successfully.", "success");
+      } catch (err) {
+        confirmedEl.textContent = "#PENDING";
+        UEM.showToast(`Verification issue: ${err.message}. Your order may still be placed — check My Orders.`, "error");
+      }
     }
+
+    confirmPhonePeOrder();
   </script>
 </body>
 </html>

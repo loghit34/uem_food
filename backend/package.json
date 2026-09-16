@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "uem-eats-backend",
   "version": "2.0.0",
   "description": "Backend API for UEM EATS V2",
@@ -13,7 +13,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "razorpay": "^2.9.4"
+    "express-rate-limit": "^8.7.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"

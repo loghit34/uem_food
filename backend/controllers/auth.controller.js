@@ -30,6 +30,22 @@ const syncProfile = async (req, res) => {
       );
     }
 
+    // If an Authorization token is present, ensure caller cannot manipulate another user's ID
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+      if (user && user.id !== id) {
+        return errorResponse(res, "Access denied: Cannot sync profile for another user ID", 403);
+      }
+    }
+
+    // Verify the user ID exists in Supabase Auth
+    const { data: authUser, error: authUserError } = await supabaseAdmin.auth.admin.getUserById(id);
+    if (authUserError || !authUser || !authUser.user) {
+      return errorResponse(res, "Invalid user ID: Auth record not found", 400);
+    }
+
     const { data, error } = await supabaseAdmin
       .from("profiles")
       .upsert({ id, email, name, role })

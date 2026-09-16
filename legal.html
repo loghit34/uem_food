@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legal — Terms, Privacy & Policies | UEM EATS</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .legal-hero {
+      background: linear-gradient(135deg, var(--secondary) 0%, #1e3a5f 100%);
+      color: #fff;
+      padding: 3rem 0 2.5rem;
+      text-align: center;
+    }
+    .legal-hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .legal-hero p  { color: rgba(255,255,255,0.75); font-size: 0.95rem; }
+
+    .legal-tabs {
+      background: #fff;
+      border-bottom: 2px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .legal-tabs-inner {
+      display: inline-flex;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    .tab-btn {
+      padding: 1rem 1.25rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--primary); }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    .legal-body { padding: 3rem 0 5rem; }
+    .legal-section { display: none; }
+    .legal-section.active { display: block; }
+
+    .legal-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 2rem 2.5rem;
+      max-width: 860px;
+      margin: 0 auto;
+      box-shadow: var(--shadow-sm);
+    }
+    .legal-card h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--secondary);
+      margin-bottom: 0.25rem;
+    }
+    .legal-card .updated {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.75rem;
+      display: block;
+    }
+    .legal-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--secondary);
+      margin: 1.75rem 0 0.6rem;
+      padding-left: 0.75rem;
+      border-left: 3px solid var(--primary);
+    }
+    .legal-card p {
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 0.75rem;
+      font-size: 0.93rem;
+    }
+    .legal-card ul {
+      margin: 0.5rem 0 0.75rem 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.93rem;
+      line-height: 1.8;
+    }
+    .legal-card ul li { margin-bottom: 0.3rem; }
+    .legal-card a { color: var(--primary); text-decoration: underline; }
+
+    .legal-alert {
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1.1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.88rem;
+      color: #9a3412;
+      font-weight: 500;
+    }
+
+    .info-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+    .info-table td {
+      padding: 0.6rem 0.75rem;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .info-table td:first-child { font-weight: 600; color: var(--secondary); width: 38%; }
+
+    @media (max-width: 640px) {
+      .legal-card { padding: 1.25rem 1rem; }
+      .legal-hero h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">🍱 UEM<span>EATS</span></a>
+      <div style="display:flex; gap:0.75rem;">
+        <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+        <a href="register.html" class="btn btn-primary btn-sm">Sign Up</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="legal-hero">
+    <div class="container">
+      <h1>📋 Legal &amp; Policies</h1>
+      <p>UEM EATS — Campus Food Ordering Platform &nbsp;·&nbsp; <a href="http://uem-foodyy.vercel.app" style="color:rgba(255,255,255,0.85);text-decoration:underline;">uem-foodyy.vercel.app</a></p>
+    </div>
+  </div>
+
+  <nav class="legal-tabs" aria-label="Legal Sections">
+    <div class="legal-tabs-inner">
+      <button class="tab-btn active" onclick="showTab('terms', this)">Terms &amp; Conditions</button>
+      <button class="tab-btn" onclick="showTab('privacy', this)">Privacy Policy</button>
+      <button class="tab-btn" onclick="showTab('refund', this)">Refund &amp; Cancellation</button>
+      <button class="tab-btn" onclick="showTab('return', this)">Return Policy</button>
+      <button class="tab-btn" onclick="showTab('shipping', this)">Shipping Policy</button>
+    </div>
+  </nav>
+
+  <main class="legal-body">
+    <div class="container">
+
+      <!-- TERMS & CONDITIONS -->
+      <section id="tab-terms" class="legal-section active">
+        <div class="legal-card">
+          <h2>Terms &amp; Conditions</h2>
+          <span class="updated">Last updated: September 2026</span>
+
+          <div class="legal-alert">
+            ⚠️ ACCESSING, BROWSING OR OTHERWISE USING THE PLATFORM INDICATES YOUR AGREEMENT TO ALL THE TERMS AND CONDITIONS. PLEASE READ CAREFULLY BEFORE PROCEEDING.
+          </div>
+
+          <p>This document is an electronic record in terms of Information Technology Act, 2000 and rules there under as applicable and the amended provisions pertaining to electronic records in various statutes as amended by the Information Technology Act, 2000. This electronic record is generated by a computer system and does not require any physical or digital signatures.</p>
+
+          <p>This document is published in accordance with the provisions of Rule 3(1) of the Information Technology (Intermediaries guidelines) Rules, 2011 that require publishing the rules and regulations, privacy policy and Terms of Use for access or usage of domain name <a href="http://uem-foodyy.vercel.app">http://uem-foodyy.vercel.app</a> ("Website"), including the related mobile site and mobile application (hereinafter referred to as "Platform").</p>
+
+          <p>The Platform is owned by <strong>Shibam Mandal</strong>, with its registered office at UEM near Karigari Bhawan Road (hereinafter referred to as "Platform Owner", "we", "us", "our").</p>
+
+          <h3>1. Acceptance of Terms</h3>
+          <p>Your use of the Platform and services and tools are governed by the following Terms of Use as applicable to the Platform including the applicable policies which are incorporated herein by way of reference. By mere use of the Platform, You shall be contracting with the Platform Owner and these terms and conditions including the policies constitute Your binding obligations with Platform Owner.</p>
+          <p>These Terms of Use can be modified at any time without assigning any reason. It is your responsibility to periodically review these Terms of Use to stay informed of updates.</p>
+
+          <h3>2. User Obligations</h3>
+          <ul>
+            <li>You agree to provide true, accurate and complete information during and after registration, and you shall be responsible for all acts done through the use of your registered account.</li>
+            <li>You agree not to use the Platform and/or Services for any purpose that is unlawful, illegal or forbidden by these Terms, or Indian or local laws that might apply to you.</li>
+            <li>You agree to pay us the charges associated with availing the Services.</li>
+            <li>Unauthorized use of the Platform may lead to action against you as per these Terms and/or applicable laws.</li>
+          </ul>
+
+          <h3>3. Disclaimer of Warranties</h3>
+          <p>Neither we nor any third parties provide any warranty or guarantee as to the accuracy, timeliness, performance, completeness or suitability of the information and materials offered on this website or through the Services, for any specific purpose. You acknowledge that such information and materials may contain inaccuracies or errors and we expressly exclude liability for any such inaccuracies or errors to the fullest extent permitted by law.</p>
+          <p>Your use of our Services and the Platform is solely and entirely at your own risk and discretion for which we shall not be liable to you in any manner.</p>
+
+          <h3>4. Intellectual Property</h3>
+          <p>The contents of the Platform and the Services are proprietary to us and are licensed to us. You will not have any authority to claim any intellectual property rights, title, or interest in its contents. The contents includes and is not limited to the design, layout, look and graphics.</p>
+
+          <h3>5. Third-Party Links</h3>
+          <p>The website and the Services may contain links to other third party websites. On accessing these links, you will be governed by the terms of use, privacy policy and such other policies of such third party websites. These links are provided for your convenience to provide further information.</p>
+
+          <h3>6. Binding Contract</h3>
+          <p>You understand that upon initiating a transaction for availing the Services you are entering into a legally binding and enforceable contract with the Platform Owner for the Services.</p>
+
+          <h3>7. Indemnification</h3>
+          <p>You shall indemnify and hold harmless Platform Owner, its affiliates, group companies (as applicable) and their respective officers, directors, agents, and employees, from any claim or demand, or actions including reasonable attorney's fees, made by any third party or penalty imposed due to or arising out of Your breach of this Terms of Use, Privacy Policy and other Policies, or Your violation of any law, rules or regulations or the rights (including infringement of intellectual property rights) of a third party.</p>
+
+          <h3>8. Force Majeure</h3>
+          <p>The parties shall not be liable for any failure to perform an obligation under these Terms if performance is prevented or delayed by a force majeure event.</p>
+
+          <h3>9. Governing Law &amp; Jurisdiction</h3>
+          <p>These Terms and any dispute or claim relating to it, or its enforceability, shall be governed by and construed in accordance with the laws of India. All disputes arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts in India.</p>
+
+          <h3>10. Contact</h3>
+          <p>All concerns or communications relating to these Terms must be communicated to us using the contact information provided on this website.</p>
+        </div>
+      </section>
+
+      <!-- PRIVACY POLICY -->
+      <section id="tab-privacy" class="legal-section">
+        <div class="legal-card">
+          <h2>Privacy Policy</h2>
+          <span class="updated">Last updated: September 2026</span>
+
+          <h3>Introduction</h3>
+          <p>This Privacy Policy describes how <strong>Shibam Mandal</strong> and its affiliates (collectively "Shibam Mandal, we, our, us") collect, use, share, protect or otherwise process your information/personal data through our website <a href="http://uem-foodyy.vercel.app">http://uem-foodyy.vercel.app</a> (hereinafter referred to as "Platform").</p>
+          <p>We do not offer any product/service under this Platform outside India and your personal data will primarily be stored and processed in India. By visiting this Platform, providing your information or availing any product/service offered on the Platform, you expressly agree to be bound by the terms and conditions of this Privacy Policy.</p>
+
+          <h3>Collection</h3>
+          <p>We collect your personal data when you use our Platform, services or otherwise interact with us during the course of our relationship. Some of the information that we may collect includes but is not limited to:</p>
+          <ul>
+            <li>Name, date of birth, address, telephone/mobile number, email ID</li>
+            <li>Any such information shared as proof of identity or address</li>
+            <li>Bank account, credit or debit card or other payment instrument information (with your consent)</li>
+            <li>Behavioural preferences and usage analytics on our Platform</li>
+            <li>Transaction information related to orders placed on the Platform</li>
+          </ul>
+          <p>If you receive an email or a call from a person/association claiming to be Shibam Mandal seeking personal data like debit/credit card PIN or net-banking passwords, please never provide such information.</p>
+
+          <h3>Usage</h3>
+          <p>We use personal data to provide the services you request. We use your personal data to:</p>
+          <ul>
+            <li>Assist sellers and business partners in handling and fulfilling orders</li>
+            <li>Enhance customer experience and resolve disputes</li>
+            <li>Inform you about online and offline offers, products, services, and updates</li>
+            <li>Detect and protect against error, fraud and other criminal activity</li>
+            <li>Enforce our terms and conditions</li>
+            <li>Conduct marketing research, analysis and surveys</li>
+          </ul>
+
+          <h3>Sharing</h3>
+          <p>We may share your personal data internally within our group entities, our other corporate entities, and affiliates to provide you access to the services and products offered by them. We may disclose personal data to third parties such as sellers, business partners, third party service providers including logistics partners.</p>
+          <p>We may disclose personal and sensitive personal data to government agencies or other authorised law enforcement agencies if required to do so by law or in the good faith belief that such disclosure is reasonably necessary.</p>
+
+          <h3>Security Precautions</h3>
+          <p>To protect your personal data from unauthorised access or disclosure, loss or misuse we adopt reasonable security practices and procedures. We adhere to our security guidelines to protect it against unauthorised access and offer the use of a secure server.</p>
+          <p>However, the transmission of information is not completely secure for reasons beyond our control. Users are responsible for ensuring the protection of login and password records for their account.</p>
+
+          <h3>Data Deletion and Retention</h3>
+          <p>You have an option to delete your account by visiting your profile and settings on our Platform. This action would result in you losing all information related to your account. We may in event of any pending grievance, claims, or pending services refuse or delay deletion of the account.</p>
+          <p>We retain your personal data information for a period no longer than is required for the purpose for which it was collected or as required under any applicable law.</p>
+
+          <h3>Your Rights</h3>
+          <p>You may access, rectify, and update your personal data directly through the functionalities provided on the Platform.</p>
+
+          <h3>Consent</h3>
+          <p>By visiting our Platform or by providing your information, you consent to the collection, use, storage, disclosure and otherwise processing of your information on the Platform in accordance with this Privacy Policy.</p>
+          <p>You have an option to withdraw your consent that you have already provided by writing to the Grievance Officer at the contact information provided below. Please mention <em>"Withdrawal of consent for processing personal data"</em> in your subject line.</p>
+
+          <h3>Changes to this Privacy Policy</h3>
+          <p>Please check our Privacy Policy periodically for changes. We may update this Privacy Policy to reflect changes to our information practices and will notify you about significant changes as may be required under applicable laws.</p>
+
+          <h3>Grievance Officer</h3>
+          <table class="info-table">
+            <tr><td>Name</td><td>Shibam Mandal</td></tr>
+            <tr><td>Platform</td><td>UEM EATS</td></tr>
+            <tr><td>Website</td><td><a href="http://uem-foodyy.vercel.app">uem-foodyy.vercel.app</a></td></tr>
+            <tr><td>Support Hours</td><td>Monday – Friday (9:00 – 18:00 IST)</td></tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- REFUND & CANCELLATION -->
+      <section id="tab-refund" class="legal-section">
+        <div class="legal-card">
+          <h2>Refund &amp; Cancellation Policy</h2>
+          <span class="updated">Last updated: September 2026</span>
+
+          <p>This refund and cancellation policy outlines how you can cancel or seek a refund for a product/service that you have purchased through the Platform.</p>
+
+          <h3>Cancellation Window</h3>
+          <p>Cancellations will only be considered if the request is made within <strong>1 day</strong> of placing the order. However, cancellation requests may not be entertained if the orders have been communicated to the seller/merchant and they have initiated the process, or the product is out for delivery. In such an event, you may choose to reject the product at the doorstep.</p>
+
+          <h3>Perishable Items</h3>
+          <p>UEM EATS does not accept cancellation requests for perishable items like food items and eatables. However, a refund/replacement can be made if the user establishes that the quality of the product delivered is not good.</p>
+
+          <h3>Damaged or Defective Items</h3>
+          <p>In case of receipt of damaged or defective items, please report to our customer service team within <strong>1 day</strong> of receipt of products. The request would be entertained once the seller/merchant has checked and determined the issue at its own end.</p>
+          <p>In case you feel that the product received is not as shown on the site or as per your expectations, you must bring it to the notice of our customer service within <strong>1 day</strong> of receiving the product. The customer service team after looking into your complaint will take an appropriate decision.</p>
+
+          <h3>Warranty Items</h3>
+          <p>In case of complaints regarding products that come with a warranty from the manufacturers, please refer the issue to them.</p>
+
+          <h3>Refund Processing Time</h3>
+          <p>In case of any refunds approved by UEM EATS, it will take <strong>7 days</strong> for the refund to be processed to you.</p>
+        </div>
+      </section>
+
+      <!-- RETURN POLICY -->
+      <section id="tab-return" class="legal-section">
+        <div class="legal-card">
+          <h2>Return Policy</h2>
+          <span class="updated">Last updated: September 2026</span>
+
+          <h3>Return Window</h3>
+          <p>We offer refund/exchange within the first <strong>1 day</strong> from the date of your purchase. If 1 day has passed since your purchase, you will not be offered a return, exchange or refund of any kind.</p>
+
+          <h3>Eligibility for Return</h3>
+          <p>In order to become eligible for a return or an exchange:</p>
+          <ul>
+            <li>The purchased item should be unused and in the same condition as you received it</li>
+            <li>The item must have original packaging</li>
+            <li>Items purchased on sale may not be eligible for a return/exchange</li>
+          </ul>
+          <p>Only such items are replaced by us (based on an exchange request) if such items are found defective or damaged.</p>
+
+          <h3>Exempted Categories</h3>
+          <p>You agree that there may be certain categories of products/items that are exempted from returns or refunds. Such categories of the products would be identified to you at the time of purchase.</p>
+
+          <h3>Return Process</h3>
+          <p>For exchange/return accepted requests (as applicable), once your returned product/item is received and inspected by us, we will send you an email to notify you about receipt of the returned/exchanged product. If the same has been approved after the quality check at our end, your request will be processed in accordance with our policies.</p>
+        </div>
+      </section>
+
+      <!-- SHIPPING POLICY -->
+      <section id="tab-shipping" class="legal-section">
+        <div class="legal-card">
+          <h2>Shipping Policy</h2>
+          <span class="updated">Last updated: September 2026</span>
+
+          <h3>Order Shipping</h3>
+          <p>The orders for the user are shipped through registered domestic courier companies and/or speed post only. Orders are shipped within <strong>1 day</strong> from the date of the order and/or payment or as per the delivery date agreed at the time of order confirmation, subject to courier company/post office norms.</p>
+
+          <h3>Delivery</h3>
+          <p>Platform Owner shall not be liable for any delay in delivery by the courier company/postal authority. Delivery of all orders will be made to the address provided by the buyer at the time of purchase. Delivery of our services will be confirmed on your email ID as specified at the time of registration.</p>
+
+          <h3>Campus Pickup (UEM EATS)</h3>
+          <p>For campus food orders on UEM EATS, items are available for direct counter pickup at the respective canteen/stall. You will be notified when your order is confirmed and ready for pickup. No delivery charges apply for campus in-person pickup orders.</p>
+
+          <h3>Shipping Charges</h3>
+          <p>If there are any shipping costs levied by the seller or the Platform Owner (as the case may be), the same are not refundable.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container" style="text-align:center;">
+      <p>&copy; 2026 UEM EATS. University of Engineering &amp; Management.</p>
+      <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--text-muted);">
+        <a href="legal.html#terms" style="color:var(--primary);">Terms &amp; Conditions</a> &nbsp;·&nbsp;
+        <a href="legal.html#privacy" style="color:var(--primary);">Privacy Policy</a> &nbsp;·&nbsp;
+        <a href="legal.html#refund" style="color:var(--primary);">Refund Policy</a> &nbsp;·&nbsp;
+        <a href="legal.html#shipping" style="color:var(--primary);">Shipping Policy</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    function showTab(name, btn) {
+      document.querySelectorAll('.legal-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Deep-link support via URL hash e.g. legal.html#privacy
+    const hashMap = {
+      '#terms': 'terms', '#privacy': 'privacy',
+      '#refund': 'refund', '#return': 'return', '#shipping': 'shipping'
+    };
+    const hash = window.location.hash;
+    if (hash && hashMap[hash]) {
+      const btn = document.querySelector(`.tab-btn[onclick*="${hashMap[hash]}"]`);
+      if (btn) showTab(hashMap[hash], btn);
+    }
+  </script>
+</body>
+</html>

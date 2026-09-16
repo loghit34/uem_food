@@ -30,9 +30,9 @@ function renderCart() {
     <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 0.85rem 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
       <div>
         <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Ordering from</span>
-        <strong style="color: var(--primary); font-size: 1.05rem;">🍱 ${cart.vendorName}</strong>
+        <strong style="color: var(--primary); font-size: 1.05rem;">🍱 ${UEM.escapeHTML(cart.vendorName)}</strong>
       </div>
-      <a href="menu.html?vendorId=${cart.vendorId}" class="btn btn-outline btn-sm">+ Add More</a>
+      <a href="menu.html?vendorId=${encodeURIComponent(cart.vendorId || '')}" class="btn btn-outline btn-sm">+ Add More</a>
     </div>
 
     <div class="cart-layout">
@@ -40,9 +40,9 @@ function renderCart() {
         ${cart.items.map(item => `
           <div class="cart-item-card">
             <div class="cart-item-details">
-              <h4 class="cart-item-name">${item.name}</h4>
+              <h4 class="cart-item-name">${UEM.escapeHTML(item.name)}</h4>
               <div class="cart-item-price">
-                ${UEM.formatCurrency(item.price)} &times; ${item.quantity} = <strong>${UEM.formatCurrency(item.price * item.quantity)}</strong>
+                ${UEM.formatCurrency(item.price)} &times; ${parseInt(item.quantity, 10)} = <strong>${UEM.formatCurrency(item.price * item.quantity)}</strong>
               </div>
             </div>
             <div class="cart-item-actions">

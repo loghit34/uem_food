@@ -1,91 +1,51 @@
-﻿/**
- * Razorpay Integration & Server-side Verification Caller
+/**
+ * PhonePe Payment Integration
+ * Flow: Backend creates PhonePe request → Frontend redirects user to PhonePe page
+ * After payment, PhonePe redirects back to payment-success.html
  */
-async function startRazorpayPayment() {
+async function startPhonePePayment() {
   const payBtn = document.getElementById("pay-btn");
   if (payBtn) {
     payBtn.disabled = true;
-    payBtn.textContent = "Initiating Payment Gateway...";
+    payBtn.textContent = "⏳ Connecting to PhonePe...";
   }
 
   const cart = UEM.getCart();
-  const user = Auth.getUser();
-  const totalAmount = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
 
   try {
-    // Step 1: Call Backend to Create Razorpay Order
+    // Step 1: Call backend to create PhonePe payment request
     const initResponse = await UEM.apiFetch("/payment/create-order", {
       method: "POST",
       body: JSON.stringify({
-        amount: totalAmount,
         vendorId: cart.vendorId,
         items: cart.items,
       }),
     });
 
-    const { orderId, amount, currency, keyId } = initResponse.data;
+    const { redirectUrl, merchantTransactionId, verifiedTotal } = initResponse.data;
 
-    // Step 2: Open Razorpay Checkout Modal
-    const options = {
-      key: keyId || CONFIG.RAZORPAY_KEY_ID,
-      amount: amount,
-      currency: currency || "INR",
-      name: "UEM EATS V2",
-      description: `Order at ${cart.vendorName}`,
-      order_id: orderId,
-      prefill: {
-        name: user.name,
-        email: user.email,
-      },
-      theme: {
-        color: "#f97316",
-      },
-      handler: async function (response) {
-        // Step 3: Send verification payload to backend
-        try {
-          if (payBtn) payBtn.textContent = "Verifying Payment Signature...";
-          
-          const verifyRes = await UEM.apiFetch("/payment/verify", {
-            method: "POST",
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              vendor_id: cart.vendorId,
-              total_amount: totalAmount,
-              items: cart.items,
-            }),
-          });
+    if (!redirectUrl) {
+      throw new Error("No redirect URL received from payment gateway");
+    }
 
-          // Step 4: Clear cart and redirect to success
-          UEM.clearCart();
-          window.location.href = `payment-success.html?orderId=${verifyRes.data.orderId}`;
-        } catch (verifyErr) {
-          UEM.showToast(`Verification failed: ${verifyErr.message}`, "error");
-          if (payBtn) {
-            payBtn.disabled = false;
-            payBtn.textContent = `Pay ${UEM.formatCurrency(totalAmount)}`;
-          }
-        }
-      },
-      modal: {
-        ondismiss: function () {
-          if (payBtn) {
-            payBtn.disabled = false;
-            payBtn.textContent = `Pay ${UEM.formatCurrency(totalAmount)} via Razorpay`;
-          }
-          UEM.showToast("Payment window closed", "info");
-        },
-      },
-    };
+    // Save transaction metadata in cart for use on success page
+    const cartData = UEM.getCart();
+    cartData.pendingTxnId = merchantTransactionId;
+    cartData.pendingVendorId = cart.vendorId;
+    localStorage.setItem(CONFIG.STORAGE_KEYS.CART, JSON.stringify(cartData));
 
-    const rzp = new Razorpay(options);
-    rzp.open();
+    // Step 2: Redirect user to PhonePe hosted payment page
+    UEM.showToast("Redirecting to PhonePe payment page...", "info");
+    setTimeout(() => {
+      window.location.href = redirectUrl;
+    }, 600);
+
   } catch (err) {
-    UEM.showToast(`Payment creation failed: ${err.message}`, "error");
+    UEM.showToast(`Payment failed: ${err.message}`, "error");
     if (payBtn) {
       payBtn.disabled = false;
-      payBtn.textContent = `Pay ${UEM.formatCurrency(totalAmount)}`;
+      const total = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+      payBtn.innerHTML = `💜 Pay ${UEM.formatCurrency(total)} via PhonePe`;
     }
   }
 }

@@ -12,6 +12,17 @@ const UEM = {
     }).format(num);
   },
 
+  // HTML Escape Helper to sanitize dynamic text and prevent XSS
+  escapeHTML(str) {
+    if (str === null || str === undefined) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  },
+
   // Format Date & Time
   formatDate(dateStr) {
     if (!dateStr) return "";

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Admin - Global Orders Management
  */
 let allOrders = [];
@@ -51,22 +51,22 @@ function renderOrdersTable() {
   tbody.innerHTML = filtered.map(o => `
     <tr>
       <td>
-        <strong style="color:var(--secondary);">#${o.id.slice(0, 8).toUpperCase()}</strong>
+        <strong style="color:var(--secondary);">#${UEM.escapeHTML(o.id ? o.id.slice(0, 8).toUpperCase() : '')}</strong>
         <div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">
-          ${o.profiles?.name || 'Student'} (${o.profiles?.role || 'STUDENT'})
+          ${UEM.escapeHTML(o.profiles?.name || 'Student')} (${UEM.escapeHTML(o.profiles?.role || 'STUDENT')})
         </div>
       </td>
       <td>
-        <strong style="color:var(--primary);">${o.vendors?.vendor_name || 'Campus Outlet'}</strong>
-        <div style="font-size:0.8rem; color:var(--text-muted);">${o.vendors?.location || ''}</div>
+        <strong style="color:var(--primary);">${UEM.escapeHTML(o.vendors?.vendor_name || 'Campus Outlet')}</strong>
+        <div style="font-size:0.8rem; color:var(--text-muted);">${UEM.escapeHTML(o.vendors?.location || '')}</div>
       </td>
       <td>
         <strong style="color:var(--secondary); font-size:1rem;">${UEM.formatCurrency(o.total_amount)}</strong>
-        <div style="font-size:0.8rem; color:var(--accent); font-weight:600;">${o.status || 'PAID'}</div>
+        <div style="font-size:0.8rem; color:var(--accent); font-weight:600;">${UEM.escapeHTML(o.status || 'PAID')}</div>
       </td>
       <td>
         <code style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:0.85rem; color:#475569;">
-          ${o.payment_id || 'N/A'}
+          ${UEM.escapeHTML(o.payment_id || 'N/A')}
         </code>
       </td>
       <td style="color:var(--text-muted); font-size:0.88rem;">

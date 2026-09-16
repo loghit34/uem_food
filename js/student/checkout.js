@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Checkout Logic
  */
 document.addEventListener("DOMContentLoaded", () => {
@@ -50,8 +50,8 @@ function renderCheckout() {
         <span style="color: var(--primary);">${UEM.formatCurrency(subtotal)}</span>
       </div>
 
-      <button id="pay-btn" onclick="startRazorpayPayment()" class="btn btn-primary btn-block" style="padding: 1rem; font-size: 1.1rem;">
-        🔒 Pay ${UEM.formatCurrency(subtotal)} via Razorpay
+      <button id="pay-btn" onclick="startPhonePePayment()" class="btn btn-primary btn-block" style="padding: 1rem; font-size: 1.1rem; background: #5f259f; border-color: #5f259f;">
+        💜 Pay ${UEM.formatCurrency(subtotal)} via PhonePe
       </button>
     </div>
   `;

@@ -20,8 +20,8 @@ async function loadVendors() {
 
     tbody.innerHTML = vendors.map(v => `
       <tr>
-        <td><strong>${v.vendor_name}</strong></td>
-        <td>${v.location || "—"}</td>
+        <td><strong>${UEM.escapeHTML(v.vendor_name)}</strong></td>
+        <td>${UEM.escapeHTML(v.location || "—")}</td>
         <td>
           <span class="badge ${v.is_active ? 'badge-success' : 'badge-warning'}">
             ${v.is_active ? "Active" : "Inactive"}
