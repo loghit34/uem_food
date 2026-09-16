@@ -86,13 +86,24 @@ const validateAndCalculateOrderItems = async (vendorId, clientItems) => {
  * Creates a verified PAID order and its associated order items & payment record
  * Includes idempotency check to prevent duplicate orders on double submissions.
  */
-const createPaidOrder = async ({ userId, vendorId, totalAmount, paymentId, razorpayOrderId, razorpayPaymentId, items }) => {
-  // Idempotency: Check if an order was already created for this payment ID
-  if (razorpayPaymentId) {
+const createPaidOrder = async ({
+  userId,
+  vendorId,
+  totalAmount,
+  paymentId,
+  merchantTransactionId,
+  transactionId,
+  items,
+}) => {
+  const effectiveTxnId = transactionId || paymentId;
+  const effectiveMerchantTxnId = merchantTransactionId || paymentId;
+
+  // Idempotency: Check if an order was already created for this payment/transaction ID
+  if (effectiveTxnId) {
     const { data: existingPayment } = await supabaseAdmin
       .from("payments")
       .select("order_id")
-      .eq("razorpay_payment_id", razorpayPaymentId)
+      .eq("razorpay_payment_id", effectiveTxnId)
       .maybeSingle();
 
     if (existingPayment && existingPayment.order_id) {
@@ -113,7 +124,7 @@ const createPaidOrder = async ({ userId, vendorId, totalAmount, paymentId, razor
         user_id: userId,
         vendor_id: vendorId,
         total_amount: totalAmount,
-        payment_id: paymentId,
+        payment_id: effectiveTxnId,
         status: "PAID",
       },
     ])
@@ -137,14 +148,14 @@ const createPaidOrder = async ({ userId, vendorId, totalAmount, paymentId, razor
 
   if (itemsError) throw new Error(`Failed to insert order items: ${itemsError.message}`);
 
-  // 3. Insert Payment Log
+  // 3. Insert Payment Log (Stores PhonePe transaction reference)
   const { error: paymentError } = await supabaseAdmin
     .from("payments")
     .insert([
       {
         order_id: order.id,
-        razorpay_order_id: razorpayOrderId,
-        razorpay_payment_id: razorpayPaymentId,
+        razorpay_order_id: effectiveMerchantTxnId,
+        razorpay_payment_id: effectiveTxnId,
         amount: totalAmount,
         status: "SUCCESS",
       },

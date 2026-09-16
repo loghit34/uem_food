@@ -48,8 +48,8 @@ const initiatePayment = async (req, res) => {
     await supabaseAdmin.from("payments").insert([
       {
         order_id: null, // will be filled after payment confirmation
-        razorpay_order_id: merchantTransactionId, // reusing field for txn ID
-        razorpay_payment_id: "PENDING",
+        razorpay_order_id: merchantTransactionId, // PhonePe merchantTransactionId
+        razorpay_payment_id: "PENDING", // PhonePe transaction status
         amount: totalAmount,
         status: "PENDING",
       },
@@ -161,9 +161,8 @@ const confirmAndCreateOrder = async (req, res) => {
       userId: req.user.id,
       vendorId,
       totalAmount,
-      paymentId: phonePePaymentId,
-      razorpayOrderId: merchantTransactionId,
-      razorpayPaymentId: phonePePaymentId,
+      merchantTransactionId,
+      transactionId: phonePePaymentId,
       items: verifiedItems,
     });
 

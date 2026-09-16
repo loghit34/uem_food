@@ -1,4 +1,4 @@
-﻿/**
+/**
  * UEM EATS V2 - Global Configuration
  */
 const isLocalCustomPort = window.location.hostname === "localhost" && window.location.port !== "5000";
@@ -12,8 +12,6 @@ const CONFIG = {
   SUPABASE_URL: "https://abuopjnbspnusijjtnuj.supabase.co",
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFidW9wam5ic3BudXNpamp0bnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyNzQxNDYsImV4cCI6MjEwNDg1MDE0Nn0.HWQexbBGPlWj5xHeG-Y9du57rtuJvGXYh7sAAKJLEjc",
   
-  // Replace with your Razorpay Key ID (Test or Live)
-  RAZORPAY_KEY_ID: "rzp_test_Tc2TQBIQyGFjLo",
   
   STORAGE_KEYS: {
     AUTH_TOKEN: "uem_token",

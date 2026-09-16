@@ -1,4 +1,4 @@
-﻿-- ========================================================
+-- ========================================================
 -- UEM EATS V2 - Database Schema
 -- ========================================================
 
@@ -60,12 +60,12 @@ CREATE TABLE IF NOT EXISTS order_items (
     quantity INTEGER NOT NULL CHECK (quantity > 0)
 );
 
--- 6. Payments Table
+-- 6. Payments Table (Stores PhonePe Payment Transaction Records)
 CREATE TABLE IF NOT EXISTS payments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
-    razorpay_order_id TEXT NOT NULL,
-    razorpay_payment_id TEXT NOT NULL,
+    razorpay_order_id TEXT NOT NULL, -- Merchant Transaction ID (PhonePe merchantTransactionId)
+    razorpay_payment_id TEXT NOT NULL, -- PhonePe Payment/Transaction ID (PhonePe transactionId)
     amount NUMERIC(10, 2) NOT NULL CHECK (amount >= 0),
     status TEXT NOT NULL DEFAULT 'SUCCESS',
     created_at TIMESTAMPTZ DEFAULT NOW()
