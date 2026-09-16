@@ -55,7 +55,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health Check
-app.get("/api/health", (req, res) => {
+app.get(["/api/health", "/health"], (req, res) => {
   res.json({
     status: "healthy",
     timestamp: new Date().toISOString(),
@@ -64,14 +64,14 @@ app.get("/api/health", (req, res) => {
 });
 
 // General API Rate Limiter
-app.use("/api/", generalLimiter);
+app.use(["/api/", "/"], generalLimiter);
 
-// API Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/vendors", vendorRoutes);
-app.use("/api/menu", menuRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/payment", paymentRoutes);
+// API Routes (mounted with and without /api prefix for Vercel serverless compatibility)
+app.use(["/api/auth", "/auth"], authRoutes);
+app.use(["/api/vendors", "/vendors"], vendorRoutes);
+app.use(["/api/menu", "/menu"], menuRoutes);
+app.use(["/api/orders", "/orders"], orderRoutes);
+app.use(["/api/payment", "/payment"], paymentRoutes);
 
 // Catch-all for unmatched API routes (returns clean JSON 404, never leaks internals)
 app.all("/api/*", (req, res) => {
