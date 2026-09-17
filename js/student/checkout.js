@@ -19,8 +19,9 @@ function renderCheckout() {
   }
 
   const subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-  const CONVENIENCE_FEE = 4.00;
-  const grandTotal = subtotal + CONVENIENCE_FEE;
+  const ORIGINAL_CONVENIENCE_FEE = (typeof CONFIG !== "undefined" && CONFIG.FEES?.ORIGINAL_CONVENIENCE_FEE) || 6.00;
+  const CURRENT_CONVENIENCE_FEE = (typeof CONFIG !== "undefined" && CONFIG.FEES?.CURRENT_CONVENIENCE_FEE) || 4.00;
+  const grandTotal = subtotal + CURRENT_CONVENIENCE_FEE;
 
   container.innerHTML = `
     <div class="card" style="padding: 2rem;">
@@ -54,7 +55,10 @@ function renderCheckout() {
 
       <div class="summary-row" style="margin-bottom: 0.75rem; font-size: 0.95rem; color: var(--text-muted);">
         <span>Platform Convenience Fee</span>
-        <span style="font-weight: 600; color: var(--text-dark);">${UEM.formatCurrency(CONVENIENCE_FEE)}</span>
+        <span>
+          <span style="text-decoration: line-through; color: var(--text-muted); margin-right: 0.4rem; font-size: 0.9em;">${UEM.formatCurrency(ORIGINAL_CONVENIENCE_FEE)}</span>
+          <span style="font-weight: 600; color: var(--text-dark);">${UEM.formatCurrency(CURRENT_CONVENIENCE_FEE)}</span>
+        </span>
       </div>
 
       <div class="summary-row summary-total" style="margin-bottom: 1.5rem;">

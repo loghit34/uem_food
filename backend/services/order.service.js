@@ -1,6 +1,11 @@
 const { supabaseAdmin } = require("../config/supabase");
 
-const CONVENIENCE_FEE = 4.0;
+// Platform Fee Configuration:
+// ORIGINAL_CONVENIENCE_FEE (₹6) is the reference fee displayed as strikethrough in UI.
+// CURRENT_CONVENIENCE_FEE (₹4) is the actual fee charged to the customer.
+const ORIGINAL_CONVENIENCE_FEE = 6.0;
+const CURRENT_CONVENIENCE_FEE = 4.0;
+const CONVENIENCE_FEE = CURRENT_CONVENIENCE_FEE;
 
 /**
  * Server-Side Price Verification:

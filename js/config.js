@@ -18,6 +18,11 @@ const CONFIG = {
     USER_PROFILE: "uem_user",
     CART: "uem_cart",
   },
+
+  FEES: {
+    ORIGINAL_CONVENIENCE_FEE: 6.00,
+    CURRENT_CONVENIENCE_FEE: 4.00,
+  },
 };
 
 // Expose globally

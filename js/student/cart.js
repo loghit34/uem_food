@@ -25,8 +25,9 @@ function renderCart() {
   }
 
   const subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-  const CONVENIENCE_FEE = 4.00;
-  const toPay = subtotal > 0 ? subtotal + CONVENIENCE_FEE : 0;
+  const ORIGINAL_CONVENIENCE_FEE = (typeof CONFIG !== "undefined" && CONFIG.FEES?.ORIGINAL_CONVENIENCE_FEE) || 6.00;
+  const CURRENT_CONVENIENCE_FEE = (typeof CONFIG !== "undefined" && CONFIG.FEES?.CURRENT_CONVENIENCE_FEE) || 4.00;
+  const toPay = subtotal > 0 ? subtotal + CURRENT_CONVENIENCE_FEE : 0;
 
   container.innerHTML = `
     <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 0.85rem 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
@@ -67,7 +68,10 @@ function renderCart() {
         </div>
         <div class="summary-row">
           <span>Convenience Fee</span>
-          <span style="font-weight: 600; color: var(--text-dark);">${UEM.formatCurrency(CONVENIENCE_FEE)}</span>
+          <span>
+            <span style="text-decoration: line-through; color: var(--text-muted); margin-right: 0.4rem; font-size: 0.9em;">${UEM.formatCurrency(ORIGINAL_CONVENIENCE_FEE)}</span>
+            <span style="font-weight: 600; color: var(--text-dark);">${UEM.formatCurrency(CURRENT_CONVENIENCE_FEE)}</span>
+          </span>
         </div>
         <div class="summary-row summary-total">
           <span>To Pay</span>

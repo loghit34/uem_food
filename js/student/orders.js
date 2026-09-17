@@ -56,7 +56,10 @@ async function loadMyOrders() {
         ${parseFloat(order.convenience_fee) > 0 ? `
           <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between;">
             <span>Platform Convenience Fee</span>
-            <span style="font-weight: 600;">${UEM.formatCurrency(order.convenience_fee)}</span>
+            <span>
+              <span style="text-decoration: line-through; color: var(--text-muted); margin-right: 0.35rem; font-size: 0.9em;">₹6.00</span>
+              <span style="font-weight: 600;">${UEM.formatCurrency(order.convenience_fee)}</span>
+            </span>
           </div>
         ` : ''}
       </div>
