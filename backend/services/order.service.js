@@ -1,8 +1,11 @@
 const { supabaseAdmin } = require("../config/supabase");
 
+const CONVENIENCE_FEE = 4.0;
+
 /**
  * Server-Side Price Verification:
  * Fetches actual menu item prices from Database to prevent client price manipulation.
+ * Also calculates the fixed platform convenience fee.
  */
 const validateAndCalculateOrderItems = async (vendorId, clientItems) => {
   if (!vendorId) {
@@ -76,9 +79,15 @@ const validateAndCalculateOrderItems = async (vendorId, clientItems) => {
     });
   }
 
+  const itemTotal = Math.round(verifiedTotal * 100) / 100;
+  const convenienceFee = CONVENIENCE_FEE;
+  const totalAmount = Math.round((itemTotal + convenienceFee) * 100) / 100;
+
   return {
     verifiedItems,
-    totalAmount: Math.round(verifiedTotal * 100) / 100,
+    itemTotal,
+    convenienceFee,
+    totalAmount,
   };
 };
 
@@ -89,6 +98,8 @@ const validateAndCalculateOrderItems = async (vendorId, clientItems) => {
 const createPaidOrder = async ({
   userId,
   vendorId,
+  itemTotal,
+  convenienceFee = CONVENIENCE_FEE,
   totalAmount,
   paymentId,
   merchantTransactionId,
@@ -97,6 +108,7 @@ const createPaidOrder = async ({
 }) => {
   const effectiveTxnId = transactionId || paymentId;
   const effectiveMerchantTxnId = merchantTransactionId || paymentId;
+  const finalItemTotal = itemTotal !== undefined ? itemTotal : Math.round((totalAmount - convenienceFee) * 100) / 100;
 
   // Idempotency: Check if an order was already created for this payment/transaction ID
   if (effectiveTxnId) {
@@ -116,22 +128,47 @@ const createPaidOrder = async ({
     }
   }
 
-  // 1. Insert Order
-  const { data: order, error: orderError } = await supabaseAdmin
+  // 1. Insert Order (with safe fallback if item_total / convenience_fee columns are not yet migrated)
+  let order;
+  const primaryOrderData = {
+    user_id: userId,
+    vendor_id: vendorId,
+    item_total: finalItemTotal,
+    convenience_fee: convenienceFee,
+    total_amount: totalAmount,
+    payment_id: effectiveTxnId,
+    status: "PAID",
+  };
+
+  const { data: insertedOrder, error: orderError } = await supabaseAdmin
     .from("orders")
-    .insert([
-      {
+    .insert([primaryOrderData])
+    .select()
+    .single();
+
+  if (orderError) {
+    if (orderError.message.includes("item_total") || orderError.message.includes("convenience_fee")) {
+      console.warn("Supabase orders table missing item_total/convenience_fee columns, inserting standard fields...");
+      const fallbackData = {
         user_id: userId,
         vendor_id: vendorId,
         total_amount: totalAmount,
         payment_id: effectiveTxnId,
         status: "PAID",
-      },
-    ])
-    .select()
-    .single();
-
-  if (orderError) throw new Error(`Failed to create order: ${orderError.message}`);
+      };
+      const { data: fbOrder, error: fbError } = await supabaseAdmin
+        .from("orders")
+        .insert([fallbackData])
+        .select()
+        .single();
+      if (fbError) throw new Error(`Failed to create order: ${fbError.message}`);
+      order = fbOrder;
+    } else {
+      throw new Error(`Failed to create order: ${orderError.message}`);
+    }
+  } else {
+    order = insertedOrder;
+  }
 
   // 2. Insert Order Items using verified prices
   const orderItemsData = items.map((item) => ({
@@ -174,6 +211,8 @@ const getUserOrders = async (userId) => {
     .from("orders")
     .select(`
       id,
+      item_total,
+      convenience_fee,
       total_amount,
       status,
       created_at,
@@ -203,6 +242,8 @@ const getVendorOrders = async (vendorId) => {
     .from("orders")
     .select(`
       id,
+      item_total,
+      convenience_fee,
       total_amount,
       status,
       created_at,
@@ -233,6 +274,8 @@ const getAllOrders = async () => {
     .from("orders")
     .select(`
       id,
+      item_total,
+      convenience_fee,
       total_amount,
       status,
       payment_id,

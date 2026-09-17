@@ -26,7 +26,12 @@ async function loadOrders() {
       return;
     }
 
-    container.innerHTML = orders.map(order => `
+    container.innerHTML = orders.map(order => {
+      const vendorEarnings = (order.item_total !== undefined && order.item_total !== null && parseFloat(order.item_total) > 0)
+        ? parseFloat(order.item_total)
+        : Math.max(0, (parseFloat(order.total_amount) || 0) - (parseFloat(order.convenience_fee) || 0));
+
+      return `
       <div class="order-ticket">
         <div class="order-ticket-header">
           <div>
@@ -35,7 +40,7 @@ async function loadOrders() {
           </div>
           <div>
             <span class="badge badge-success">${UEM.escapeHTML(order.status)}</span>
-            <strong style="margin-left: 0.75rem; font-size: 1.2rem; color: var(--secondary);">${UEM.formatCurrency(order.total_amount)}</strong>
+            <strong style="margin-left: 0.75rem; font-size: 1.2rem; color: var(--secondary);">${UEM.formatCurrency(vendorEarnings)}</strong>
           </div>
         </div>
 
@@ -53,7 +58,8 @@ async function loadOrders() {
           </ul>
         </div>
       </div>
-    `).join("");
+    `;
+    }).join("");
   } catch (err) {
     container.innerHTML = `<p style="color:var(--danger);">Error loading orders: ${err.message}</p>`;
   }

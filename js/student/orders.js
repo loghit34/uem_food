@@ -53,6 +53,12 @@ async function loadMyOrders() {
             `).join("")}
           </ul>
         </div>
+        ${parseFloat(order.convenience_fee) > 0 ? `
+          <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+            <span>Platform Convenience Fee</span>
+            <span style="font-weight: 600;">${UEM.formatCurrency(order.convenience_fee)}</span>
+          </div>
+        ` : ''}
       </div>
     `).join("");
   } catch (err) {

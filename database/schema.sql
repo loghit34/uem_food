@@ -44,6 +44,8 @@ CREATE TABLE IF NOT EXISTS orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
     vendor_id UUID REFERENCES vendors(id) ON DELETE CASCADE,
+    item_total NUMERIC(10, 2) NOT NULL DEFAULT 0.00 CHECK (item_total >= 0),
+    convenience_fee NUMERIC(10, 2) NOT NULL DEFAULT 4.00 CHECK (convenience_fee >= 0),
     total_amount NUMERIC(10, 2) NOT NULL CHECK (total_amount >= 0),
     payment_id TEXT,
     status TEXT NOT NULL DEFAULT 'PAID' CHECK (status = 'PAID'),

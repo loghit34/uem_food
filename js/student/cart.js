@@ -25,6 +25,8 @@ function renderCart() {
   }
 
   const subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+  const CONVENIENCE_FEE = 4.00;
+  const toPay = subtotal > 0 ? subtotal + CONVENIENCE_FEE : 0;
 
   container.innerHTML = `
     <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 0.85rem 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
@@ -65,14 +67,11 @@ function renderCart() {
         </div>
         <div class="summary-row">
           <span>Convenience Fee</span>
-          <span>
-            <span style="text-decoration: line-through; color: var(--text-muted); margin-right: 0.35rem;">₹4</span>
-            <span style="color: var(--accent); font-weight: 600;">FREE</span>
-          </span>
+          <span style="font-weight: 600; color: var(--text-dark);">${UEM.formatCurrency(CONVENIENCE_FEE)}</span>
         </div>
         <div class="summary-row summary-total">
           <span>To Pay</span>
-          <span style="color: var(--primary);">${UEM.formatCurrency(subtotal)}</span>
+          <span style="color: var(--primary);">${UEM.formatCurrency(toPay)}</span>
         </div>
         <button onclick="window.location.href='checkout.html'" class="btn btn-primary btn-block" style="margin-top: 1.5rem; padding: 0.9rem; font-size: 1.05rem;">
           Proceed to Checkout &rarr;

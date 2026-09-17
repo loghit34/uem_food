@@ -44,7 +44,8 @@ async function startPhonePePayment() {
     UEM.showToast(`Payment failed: ${err.message}`, "error");
     if (payBtn) {
       payBtn.disabled = false;
-      const total = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+      const subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+      const total = subtotal > 0 ? subtotal + 4.00 : 0;
       payBtn.innerHTML = `💜 Pay ${UEM.formatCurrency(total)} via PhonePe`;
     }
   }

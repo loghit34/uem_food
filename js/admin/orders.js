@@ -62,7 +62,10 @@ function renderOrdersTable() {
       </td>
       <td>
         <strong style="color:var(--secondary); font-size:1rem;">${UEM.formatCurrency(o.total_amount)}</strong>
-        <div style="font-size:0.8rem; color:var(--accent); font-weight:600;">${UEM.escapeHTML(o.status || 'PAID')}</div>
+        <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">
+          Food: ${UEM.formatCurrency(o.item_total !== undefined && o.item_total !== null ? o.item_total : Math.max(0, (parseFloat(o.total_amount) || 0) - (parseFloat(o.convenience_fee) || 4)))} | Fee: ${UEM.formatCurrency(o.convenience_fee !== undefined && o.convenience_fee !== null ? o.convenience_fee : 4)}
+        </div>
+        <div style="font-size:0.8rem; color:var(--accent); font-weight:600; margin-top:2px;">${UEM.escapeHTML(o.status || 'PAID')}</div>
       </td>
       <td>
         <code style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:0.85rem; color:#475569;">

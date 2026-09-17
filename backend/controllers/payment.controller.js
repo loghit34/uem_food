@@ -20,8 +20,8 @@ const initiatePayment = async (req, res) => {
       return errorResponse(res, "Invalid payment request parameters", 400);
     }
 
-    // Server-side price recalculation from database
-    const { verifiedItems, totalAmount } = await validateAndCalculateOrderItems(vendorId, items);
+    // Server-side price recalculation from database (includes fixed ₹4 platform convenience fee)
+    const { verifiedItems, itemTotal, convenienceFee, totalAmount } = await validateAndCalculateOrderItems(vendorId, items);
 
     if (totalAmount <= 0) {
       return errorResponse(res, "Total amount must be greater than zero", 400);
@@ -61,6 +61,8 @@ const initiatePayment = async (req, res) => {
         redirectUrl: phonePeRedirectUrl,
         merchantTransactionId,
         verifiedTotal: totalAmount,
+        itemTotal,
+        convenienceFee,
         verifiedItems,
       },
       "PhonePe payment initiated successfully"
@@ -153,13 +155,15 @@ const confirmAndCreateOrder = async (req, res) => {
 
     const phonePePaymentId = statusResponse.data?.transactionId || merchantTransactionId;
 
-    // Recalculate prices from DB
-    const { verifiedItems, totalAmount } = await validateAndCalculateOrderItems(vendorId, items);
+    // Recalculate prices from DB (includes fixed ₹4 platform convenience fee)
+    const { verifiedItems, itemTotal, convenienceFee, totalAmount } = await validateAndCalculateOrderItems(vendorId, items);
 
     // Create the order
     const order = await createPaidOrder({
       userId: req.user.id,
       vendorId,
+      itemTotal,
+      convenienceFee,
       totalAmount,
       merchantTransactionId,
       transactionId: phonePePaymentId,
@@ -168,7 +172,13 @@ const confirmAndCreateOrder = async (req, res) => {
 
     return successResponse(
       res,
-      { orderId: order.id, status: order.status, totalAmount: order.total_amount },
+      {
+        orderId: order.id,
+        status: order.status,
+        itemTotal: order.item_total !== undefined ? order.item_total : itemTotal,
+        convenienceFee: order.convenience_fee !== undefined ? order.convenience_fee : convenienceFee,
+        totalAmount: order.total_amount || totalAmount,
+      },
       "Payment verified and order placed successfully",
       201
     );

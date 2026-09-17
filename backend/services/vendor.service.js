@@ -1,4 +1,4 @@
-﻿const { supabaseAdmin } = require("../config/supabase");
+const { supabaseAdmin } = require("../config/supabase");
 
 /**
  * Calculate vendor dashboard metrics (Today's sales, Total sales, Total orders)
@@ -10,7 +10,7 @@ const getVendorAnalytics = async (vendorId) => {
   // All paid orders for vendor
   const { data: allOrders, error: allOrdersError } = await supabaseAdmin
     .from("orders")
-    .select("id, total_amount, created_at")
+    .select("id, total_amount, item_total, convenience_fee, created_at")
     .eq("vendor_id", vendorId);
 
   if (allOrdersError) throw new Error(allOrdersError.message);
@@ -20,7 +20,14 @@ const getVendorAnalytics = async (vendorId) => {
   let todayOrdersCount = 0;
 
   allOrders.forEach((order) => {
-    const amount = parseFloat(order.total_amount) || 0;
+    // Vendor earnings are based on item_total (food amount), excluding the platform convenience fee
+    let amount = 0;
+    if (order.item_total !== undefined && order.item_total !== null && parseFloat(order.item_total) > 0) {
+      amount = parseFloat(order.item_total);
+    } else {
+      const fee = parseFloat(order.convenience_fee) || 0;
+      amount = Math.max(0, (parseFloat(order.total_amount) || 0) - fee);
+    }
     totalSales += amount;
 
     const orderDate = new Date(order.created_at);
