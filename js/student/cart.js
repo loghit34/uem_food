@@ -65,7 +65,10 @@ function renderCart() {
         </div>
         <div class="summary-row">
           <span>Convenience Fee</span>
-          <span style="color: var(--accent); font-weight: 600;">FREE</span>
+          <span>
+            <span style="text-decoration: line-through; color: var(--text-muted); margin-right: 0.35rem;">₹4</span>
+            <span style="color: var(--accent); font-weight: 600;">FREE</span>
+          </span>
         </div>
         <div class="summary-row summary-total">
           <span>To Pay</span>

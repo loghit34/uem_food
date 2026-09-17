@@ -45,6 +45,14 @@ function renderCheckout() {
         </ul>
       </div>
 
+      <div class="summary-row" style="margin-bottom: 0.75rem;">
+        <span>Convenience Fee</span>
+        <span>
+          <span style="text-decoration: line-through; color: var(--text-muted); margin-right: 0.35rem;">₹4</span>
+          <span style="color: var(--accent); font-weight: 600;">FREE</span>
+        </span>
+      </div>
+
       <div class="summary-row summary-total" style="margin-bottom: 1.5rem;">
         <span>Grand Total (Payable Online)</span>
         <span style="color: var(--primary);">${UEM.formatCurrency(subtotal)}</span>
